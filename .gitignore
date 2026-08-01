@@ -6,7 +6,6 @@
 # Go
 /bin/
 /dist/
-*.exe
 *.exe~
 *.dll
 *.so

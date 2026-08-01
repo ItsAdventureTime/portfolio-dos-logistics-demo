@@ -9,15 +9,15 @@ on:
 jobs:
   backend:
     runs-on: ubuntu-latest
+    container: golang:1.26-alpine
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version: '1.26'
+      - name: install git
+        run: apk add --no-cache git gcc musl-dev
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
-        with:
-          version: latest
+        run: |
+          go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+          $(go env GOPATH)/bin/golangci-lint run ./...
       - name: go vet
         run: go vet ./...
       - name: go test
@@ -27,11 +27,9 @@ jobs:
 
   frontend:
     runs-on: ubuntu-latest
+    container: node:22-alpine
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
       - name: install
         working-directory: web
         run: npm ci
@@ -50,11 +48,14 @@ jobs:
 
   secret-scan:
     runs-on: ubuntu-latest
+    container: golang:1.26-alpine
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: install git
+        run: apk add --no-cache git
       - name: gitleaks
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          go install github.com/zricethezav/gitleaks/v8@latest
+          $(go env GOPATH)/bin/gitleaks detect --source . --no-banner

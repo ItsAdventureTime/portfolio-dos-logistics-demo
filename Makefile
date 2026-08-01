@@ -1,64 +1,62 @@
-.PHONY: build test test-unit test-integration lint vet typecheck fmt migrate-up migrate-down migrate-status run dev web-dev web-build web-test secret-scan all
+.PHONY: build test test-unit test-integration lint vet typecheck fmt migrate-up migrate-down migrate-status run dev web-dev web-build web-test web-lint web-typecheck secret-scan all
 
-GOPATH_BIN := $(shell go env GOPATH)/bin
+DEV := ./scripts/dos-dev
 
 build:
-	go build -o bin/api ./cmd/api
-	go build -o bin/migrate ./cmd/migrate
+	$(DEV) go build -o bin/api ./cmd/api
+	$(DEV) go build -o bin/migrate ./cmd/migrate
 
 test:
-	go test ./...
+	$(DEV) go test ./...
 
 test-unit:
-	go test -short ./...
+	$(DEV) go test -short ./...
 
 test-integration:
-	go test -run Integration ./...
+	$(DEV) go test -run Integration ./...
 
 vet:
-	go vet ./...
+	$(DEV) go vet ./...
 
 lint: vet
-	$(GOPATH_BIN)/golangci-lint run ./...
+	$(DEV) golangci-lint run ./...
 
 typecheck:
-	cd web && npx tsc --noEmit -p tsconfig.app.json
+	$(DEV) web npx tsc --noEmit -p tsconfig.app.json
 
 fmt:
-	gofmt -w .
-	gofumpt -w .
+	$(DEV) gofmt -w .
 
 migrate-up:
-	go run ./cmd/migrate up
+	$(DEV) goose -dir internal/store/migrations "$(DATABASE_URL)" up
 
 migrate-down:
-	go run ./cmd/migrate down
+	$(DEV) goose -dir internal/store/migrations "$(DATABASE_URL)" down
 
 migrate-status:
-	go run ./cmd/migrate status
+	$(DEV) goose -dir internal/store/migrations "$(DATABASE_URL)" status
 
+# Run API locally on host (requires Go installed on host, or use:
+#   podman run --rm -v $(PWD):/workspace -p 8080:8080 golang:1.26-alpine go run ./cmd/api)
 run:
 	go run ./cmd/api
-
-dev:
-	go run ./cmd/api &
 
 web-dev:
 	cd web && npm run dev
 
 web-build:
-	cd web && npm run build
+	$(DEV) web npm run build
 
 web-test:
-	cd web && npm run test
+	$(DEV) web npx vitest run
 
 web-lint:
-	cd web && npm run lint
+	$(DEV) web npx oxlint src
 
 web-typecheck:
-	cd web && npm run typecheck
+	$(DEV) web npx tsc --noEmit -p tsconfig.app.json
 
 secret-scan:
-	$(GOPATH_BIN)/gitleaks detect --source . --no-banner
+	$(DEV) gitleaks detect --source . --no-banner --config .gitleaks.toml
 
 all: lint test web-typecheck web-test web-build build

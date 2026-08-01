@@ -1,0 +1,81 @@
+#!/usr/bin/env sh
+# dos-dev — run build/test/lint/generate tooling inside Podman containers.
+# Nothing compiles or executes on the host. Mounts the repo read-write but
+# tooling binaries live inside ephemeral containers.
+#
+# Usage:
+#   ./scripts/dos-dev go build ./...
+#   ./scripts/dos-dev go test ./...
+#   ./scripts/dos-dev golangci-lint run ./...
+#   ./scripts/dos-dev sqlc generate
+#   ./scripts/dos-dev goose -dir internal/store/migrations status
+#   ./scripts/dos-dev gitleaks detect --source . --no-banner
+#   ./scripts/dos-dev web npm run build
+#   ./scripts/dos-dev web npx vitest run
+
+set -eu
+
+REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+WORK_DIR="/workspace"
+GO_IMAGE="golang:1.26-alpine"
+NODE_IMAGE="node:22-alpine"
+
+run_go() {
+  podman run --rm \
+    -v "${REPO_ROOT}:${WORK_DIR}:Z" \
+    -w "${WORK_DIR}" \
+    -e GOPATH=/go \
+    -e CGO_ENABLED=0 \
+    "${GO_IMAGE}" \
+    sh -c "apk add --no-cache git gcc musl-dev >/dev/null 2>&1; $*"
+}
+
+run_go_tool() {
+  tool="$1"
+  shift
+  case "${tool}" in
+    golangci-lint) install_path="github.com/golangci/golangci-lint/cmd/golangci-lint@latest" ;;
+    sqlc)          install_path="github.com/sqlc-dev/sqlc/cmd/sqlc@latest" ;;
+    goose)         install_path="github.com/pressly/goose/v3/cmd/goose@latest" ;;
+    gitleaks)      install_path="github.com/zricethezav/gitleaks/v8@latest" ;;
+    *) echo "unknown tool: ${tool}" >&2; exit 1 ;;
+  esac
+  podman run --rm \
+    -v "${REPO_ROOT}:${WORK_DIR}:Z" \
+    -w "${WORK_DIR}" \
+    -e GOPATH=/go \
+    -e CGO_ENABLED=0 \
+    "${GO_IMAGE}" \
+    sh -c "apk add --no-cache git gcc musl-dev >/dev/null 2>&1; go install ${install_path} 2>/dev/null; \$(go env GOPATH)/bin/${tool} $*"
+}
+
+run_web() {
+  podman run --rm \
+    -v "${REPO_ROOT}/web:${WORK_DIR}/web:Z" \
+    -w "${WORK_DIR}/web" \
+    "${NODE_IMAGE}" \
+    sh -c "npm ci --silent 2>/dev/null; $*"
+}
+
+cmd="$1"
+shift || true
+
+case "${cmd}" in
+  go)
+    run_go "go $*"
+    ;;
+  golangci-lint|sqlc|goose|gitleaks)
+    run_go_tool "${cmd}" "$*"
+    ;;
+  web)
+    run_web "$*"
+    ;;
+  *)
+    echo "Usage: $0 {go|golangci-lint|sqlc|goose|gitleaks|web} [args...]" >&2
+    echo "  $0 go test ./..." >&2
+    echo "  $0 golangci-lint run ./..." >&2
+    echo "  $0 sqlc generate" >&2
+    echo "  $0 web npm run build" >&2
+    exit 1
+    ;;
+esac

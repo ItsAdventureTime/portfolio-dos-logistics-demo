@@ -1,0 +1,12 @@
+title = "DOS FreightFlow Control gitleaks config"
+
+[allowlist]
+description = "Allow synthetic test fixtures and env example placeholders"
+paths = [
+  '''\.env\.example$''',
+  '''config_test\.go$''',
+]
+regexes = [
+  '''0123456789abcdef0123456789abcdef''',
+  '''replace-with-32-plus-byte-random-secret-value''',
+]
