@@ -1,0 +1,30 @@
+[Unit]
+Description=DOS FreightFlow Control PostgreSQL (rootless Podman)
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+Image=docker.io/library/postgres:17-alpine
+ContainerName=dos-postgres
+PublishPort=127.0.0.1:5433:5432
+Environment=POSTGRES_DB=dosfreightflow
+Environment=POSTGRES_USER=dos
+EnvironmentFile=%h/.config/dos-freightflow/postgres.env
+Volume=%h/data/dos-freightflow/postgres:/var/lib/postgresql/data:Z
+HealthCmd=pg_isready -U dos -d dosfreightflow
+HealthInterval=15s
+HealthRetries=5
+HealthTimeout=5s
+NoNewPrivileges=true
+DropCapability=ALL
+Tmpfs=/tmp:rw,size=64m
+PidsLimit=256
+Memory=512m
+
+[Service]
+Restart=always
+RestartSec=5
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

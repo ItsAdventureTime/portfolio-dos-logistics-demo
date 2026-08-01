@@ -1,0 +1,28 @@
+[Unit]
+Description=DOS FreightFlow Control Web (rootless Podman)
+After=dos-api.service
+Wants=dos-api.service
+
+[Container]
+Image=dos-freightflow-web:latest
+ContainerName=dos-web
+PublishPort=127.0.0.1:8082:8080
+HealthCmd=wget -qO- http://127.0.0.1:8080/ || exit 1
+HealthInterval=30s
+HealthRetries=3
+HealthTimeout=5s
+NoNewPrivileges=true
+DropCapability=ALL
+ReadOnly=true
+Tmpfs=/tmp:rw,size=64m
+PidsLimit=128
+Memory=256m
+CPUShares=256
+
+[Service]
+Restart=always
+RestartSec=5
+TimeoutStartSec=60
+
+[Install]
+WantedBy=default.target

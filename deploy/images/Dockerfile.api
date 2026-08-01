@@ -1,0 +1,53 @@
+# Multi-stage build for the DOS FreightFlow Control API.
+# Stage 1: build the static Go binary.
+# Stage 2: minimal Alpine runtime as a non-root user.
+#
+# Per ADR-001: CGO_ENABLED=0 produces a static binary that avoids musl
+# compatibility issues on Alpine. If native dependencies are ever needed,
+# switch the runtime base to golang:bookworm-slim.
+
+FROM golang:1.26-alpine AS builder
+
+RUN apk add --no-cache git ca-certificates
+
+WORKDIR /build
+
+# Cache module downloads — copy go files first.
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy source and build.
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
+    -ldflags="-s -w" \
+    -o /out/api ./cmd/api
+
+# Also build the migration runner.
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
+    -ldflags="-s -w" \
+    -o /out/migrate ./cmd/migrate
+
+# Stage 2: minimal runtime.
+FROM alpine:3.22
+
+RUN apk add --no-cache ca-certificates tzdata && \
+    addgroup -S dos && \
+    adduser -S -G dos -h /app dos
+
+WORKDIR /app
+
+# Copy binaries and migrations from the builder.
+COPY --from=builder /out/api /app/api
+COPY --from=builder /out/migrate /app/migrate
+COPY --from=builder /build/internal/store/migrations /app/migrations
+
+# Run as the non-root user.
+USER dos
+
+EXPOSE 8080
+
+# Health check — the API serves /healthz on loopback.
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 --start-period=10s \
+    CMD wget -qO- http://127.0.0.1:8080/healthz || exit 1
+
+ENTRYPOINT ["/app/api"]

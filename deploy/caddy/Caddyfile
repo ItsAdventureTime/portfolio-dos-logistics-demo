@@ -1,0 +1,40 @@
+# Caddyfile for DOS FreightFlow Control.
+# Serves the web client and proxies API requests to the backend.
+# In production, Caddy terminates TLS and binds to loopback; an external
+# reverse proxy or load balancer handles public-facing TLS.
+
+{
+	# Disable the admin API endpoint for security.
+	admin off
+}
+
+:8080 {
+	# Security headers.
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "no-referrer"
+		Permissions-Policy "geolocation=(), microphone=(), camera=()"
+	}
+
+	# API and auth routes proxy to the Go backend.
+	handle /api/* {
+		reverse_proxy 127.0.0.1:8081
+	}
+
+	handle /auth/* {
+		reverse_proxy 127.0.0.1:8081
+	}
+
+	handle /healthz* {
+		reverse_proxy 127.0.0.1:8081
+	}
+
+	# Static files for the web client.
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+}

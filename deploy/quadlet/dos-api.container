@@ -1,0 +1,32 @@
+[Unit]
+Description=DOS FreightFlow Control API (rootless Podman)
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+Image=dos-freightflow-api:latest
+ContainerName=dos-api
+PublishPort=127.0.0.1:8081:8080
+Environment=APP_ENV=production
+Environment=HTTP_ADDR=0.0.0.0:8080
+EnvironmentFile=%h/.config/dos-freightflow/api.env
+HealthCmd=wget -qO- http://127.0.0.1:8080/healthz || exit 1
+HealthInterval=30s
+HealthRetries=3
+HealthTimeout=5s
+Volume=%h/data/dos-freightflow:/app/data:Z
+NoNewPrivileges=true
+DropCapability=ALL
+ReadOnly=true
+Tmpfs=/tmp:rw,size=128m
+PidsLimit=256
+Memory=512m
+CPUShares=512
+
+[Service]
+Restart=always
+RestartSec=5
+TimeoutStartSec=120
+
+[Install]
+WantedBy=default.target
