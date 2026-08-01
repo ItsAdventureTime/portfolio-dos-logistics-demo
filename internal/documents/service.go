@@ -50,9 +50,9 @@ func NewDocumentService(storage Storage, auditFunc func(ctx context.Context, e *
 	}
 }
 
-// Upload validates, stores, and records a supporting document.
-// The caller must have already verified the user is authenticated and
-// authorized to access the parent entity.
+// Upload validates, stores, and records a supporting document. The caller
+// must have already verified the user is authenticated and authorized to
+// access the parent entity.
 func (s *DocumentService) Upload(ctx context.Context, actor domain.UserID, entityType, entityID string, header *multipartFileHeader, content []byte) (*DocumentRecord, error) {
 	corrID := observability.CorrelationFrom(ctx)
 
@@ -102,9 +102,9 @@ func (s *DocumentService) Upload(ctx context.Context, actor domain.UserID, entit
 }
 
 // Download retrieves a document by ID. The caller must verify that the
-// authenticated user is authorized to access the parent entity — this
-// method does NOT perform authorization checks itself (the route handler
-// must do that via RequireAuth + entity ownership verification).
+// authenticated user is authorized to access the parent entity — this method
+// does not perform authorization checks itself. The route handler handles
+// that via RequireAuth and entity ownership verification.
 func (s *DocumentService) Download(ctx context.Context, documentID string) (content []byte, contentType string, documentName string, err error) {
 	record, ok := s.records[documentID]
 	if !ok {
@@ -150,8 +150,9 @@ func (s *DocumentService) Delete(ctx context.Context, documentID string, actor d
 	return nil
 }
 
-// ServeFile writes document content to an HTTP response with appropriate headers.
-// Per docs/spec/03: files must be behind authenticated authorization checks.
+// ServeFile writes document content to an HTTP response with appropriate
+// headers. Content is always served as an attachment with nosniff and
+// no-store to prevent caching and MIME-type confusion.
 func ServeFile(w http.ResponseWriter, content []byte, contentType, fileName string) {
 	w.Header().Set("Content-Type", contentType)
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", fileName))

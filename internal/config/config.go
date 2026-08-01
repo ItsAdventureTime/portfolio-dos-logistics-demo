@@ -1,5 +1,5 @@
 // Package config loads and validates application configuration from the
-// environment. Secrets are never logged.
+// environment.
 package config
 
 import (
@@ -11,8 +11,8 @@ import (
 	"time"
 )
 
-// Config holds all runtime configuration. Fields marked sensitive must not be
-// logged or serialized in error messages.
+// Config holds all runtime configuration. Sensitive fields are never logged
+// or included in error messages.
 type Config struct {
 	Env            string        `env:"APP_ENV"`
 	HTTPAddr       string        `env:"HTTP_ADDR"`
@@ -27,9 +27,8 @@ type Config struct {
 	LogLevel       string        `env:"LOG_LEVEL"`
 }
 
-// Load reads configuration from the environment and validates it. It returns
-// an error describing the first invalid or missing value; error messages never
-// reveal secret values.
+// Load reads configuration from the environment and validates it. Error
+// messages never reveal secret values.
 func Load() (Config, error) {
 	c := Config{
 		Env:             getenv("APP_ENV", "development"),

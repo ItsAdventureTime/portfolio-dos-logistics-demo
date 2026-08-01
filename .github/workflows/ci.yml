@@ -12,7 +12,7 @@ jobs:
     container: golang:1.26-alpine
     steps:
       - uses: actions/checkout@v4
-      - name: install git
+      - name: Install dependencies
         run: apk add --no-cache git gcc musl-dev
       - name: golangci-lint
         run: |
@@ -30,7 +30,7 @@ jobs:
     container: node:22-alpine
     steps:
       - uses: actions/checkout@v4
-      - name: install
+      - name: Install dependencies
         working-directory: web
         run: npm ci
       - name: lint
@@ -53,9 +53,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: install git
+      - name: Install dependencies
         run: apk add --no-cache git
       - name: gitleaks
         run: |
           go install github.com/zricethezav/gitleaks/v8@latest
-          $(go env GOPATH)/bin/gitleaks detect --source . --no-banner
+          $(go env GOPATH)/bin/gitleaks detect --source . --no-banner --config .gitleaks.toml

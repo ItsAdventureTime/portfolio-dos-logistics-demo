@@ -1,6 +1,7 @@
-// Package service contains the business logic for authentication and
-// session management. It depends on repository interfaces, not concrete
-// database adapters, keeping it testable without a real database.
+// Package service contains the business logic for authentication, session
+// management, and the workflow slices. It depends on repository interfaces,
+// not concrete database adapters, so it can be tested without a real
+// database.
 package service
 
 import (
@@ -17,8 +18,8 @@ import (
 	"github.com/google/uuid"
 )
 
-// Errors. These are deliberately neutral — they do not reveal whether an
-// account exists (per docs/spec/01-product-requirements.md).
+// Errors are deliberately neutral — they don't reveal whether an account
+// exists.
 var (
 	ErrInvalidCredentials = errors.New("invalid credentials")
 	ErrEmailNotVerified   = errors.New("email not verified")

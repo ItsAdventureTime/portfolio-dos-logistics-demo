@@ -7,7 +7,7 @@ export default function App() {
         DOS FreightFlow Control
       </h1>
       <p className="text-[hsl(var(--content-muted))]">
-        Stage 2 foundation — build verified.
+        Build verified. Ready for development.
       </p>
       <Button className="rounded-lg bg-[hsl(var(--action))] px-4 py-2 text-[hsl(var(--action-foreground))]">
         Primary action

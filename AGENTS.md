@@ -1,73 +1,75 @@
-# DOS FreightFlow Control — implementation repository
+# DOS FreightFlow Control — Implementation Guide
 
-This is the original implementation of DOS FreightFlow Control, a private B2B
-workspace for freight movement and the related financial controls. It is built
-from the specification package in `docs/spec/` only. The spec repository
-(`portfolio-dos-logistics-demo`) is a separate, spec-only package; this repo
-holds the implementation.
+This repository holds the implementation of DOS FreightFlow Control, a private
+B2B workspace for freight movement and the related financial controls. The
+build follows the specification package in [`docs/spec/`](docs/spec/), which
+contains the product requirements, domain model, security boundaries,
+architecture options, acceptance matrix, implementation plan, and approved
+DOS design assets.
 
-## Read before making changes
+## Getting started
 
-1. Read [`docs/spec/AGENTS.md`](docs/spec/AGENTS.md) — instructions for the
-   from-scratch build agent.
-2. Read [`docs/spec/00-build-contract.md`](docs/spec/00-build-contract.md) —
-   the build contract and working rules.
-3. Read [`DECISIONS.md`](DECISIONS.md) — the dated decision log. Architecture
-   choices that deviate from the spec's suggestions are recorded there with
-   tradeoffs, validation evidence, and rollback plans.
+Before writing any code:
+
+1. Read [`docs/spec/AGENTS.md`](docs/spec/AGENTS.md) for the build agent
+   instructions.
+2. Read [`docs/spec/00-build-contract.md`](docs/spec/00-build-contract.md) for
+   the working rules and legal boundaries.
+3. Read [`DECISIONS.md`](DECISIONS.md) for the architecture decision log. Every
+   choice that diverges from the spec's suggestions is recorded there with
+   tradeoffs, evidence, and a rollback plan.
 4. Follow [`docs/spec/06-implementation-plan.md`](docs/spec/06-implementation-plan.md)
-   as the recommended build sequence; deviations must be recorded in
-   `DECISIONS.md`.
-
-## Status
-
-- Stage 1 (confirm the contract) is complete. `DECISIONS.md` is seeded with
-  ADR-001 through ADR-007. The spec is copied read-only under `docs/spec/`.
-- No application code exists yet.
+   as the recommended build sequence. Any deviation goes in `DECISIONS.md`.
 
 ## Build boundary
 
-Per `docs/spec/07-independent-build-boundary.md` and the spec repo's
-`AGENTS.md`:
+The spec is firm about what we can and can't use:
 
-- Use only `docs/spec/` (requirements, domain, security, architecture,
-  acceptance, implementation plan, boundary, design guidelines) and
-  `docs/spec/design-assets/` (approved DOS PNGs) as inputs.
-- Do not reference the earlier working demo, its source, tests, migrations,
-  screenshots, styles, markup, copy, or Git history. It is not in this repo.
-- Build with original source, original UI composition, original copy, and
-  original test fixtures. Public industry terminology and common software
-  patterns are acceptable; copied expression is not.
-- Keep a dated decision log (`DECISIONS.md`) for changes that affect security,
-  data, architecture, or public behavior.
-- Keep API contracts, database migrations, UI behavior, tests, and guides in
-  sync.
-- Use fictional data and `.example` email addresses in development fixtures.
-- Keep the application private. A visitor must not gain access to operational
-  data without an issued account.
-- Before publishing, confirm ownership and usage rights for the DOS name,
-  logo files, domain, technical requirements, and final source with qualified
-  counsel. This repository is process guidance, not legal advice.
+- **Inputs**: only `docs/spec/` (the specification documents and approved DOS
+  PNG assets) and public technical references. Original decisions, source,
+  tests, fixtures, and documentation are fair game.
+- **Off limits**: the earlier working demo — its source, tests, migrations,
+  screenshots, styles, markup, copy, and Git history. It's not in this repo,
+  and we don't reference it.
+- **Originality**: build with original source, UI composition, copy, and test
+  fixtures. Public industry terminology and common software patterns are
+  fine; copied expression is not.
+- **Privacy**: keep the application private. No visitor gets operational data
+  without an issued account. Use fictional data and `.example` email addresses
+  in development fixtures.
+- **Legal**: before publishing, confirm ownership and usage rights for the
+  DOS name, logo files, domain, and final source with qualified counsel. This
+  guide is process documentation, not legal advice.
 
-## Stack (decided — see DECISIONS.md)
+## Tech stack
 
-- Backend: Go modular monolith (Chi + pgx + sqlc + goose) + PostgreSQL
-- Frontend: React 19 + TypeScript + Vite + React Aria Components + TanStack
-  Table v8 / Query + React Hook Form + Zod + Tailwind v4 (shadcn-style tokens,
-  no vendored component source)
-- Gateway: Caddy
-- Deployment: rootless Podman Quadlet (systemd user units)
+These decisions are recorded in `DECISIONS.md`:
 
-## Required final report
+- **Backend**: Go modular monolith — Chi, pgx, sqlc, goose, PostgreSQL
+- **Frontend**: React 19 + TypeScript + Vite + React Aria Components +
+  TanStack Table v8 / Query + React Hook Form + Zod + Tailwind v4
+- **Gateway**: Caddy
+- **Deployment**: rootless Podman Quadlet (systemd user units)
 
-Per `docs/spec/05-acceptance-matrix.md`, the implementation is complete only
-when each applicable check passes and its result is recorded, and the
-implementation model finishes with:
+## Status
 
-- Files changed and decisions made.
-- Commands run and their results.
-- Tests not run and why.
-- Known limitations and follow-up work.
-- The exact commit or branch containing the implementation.
+Stages 1 through 5 are complete:
 
-Do not claim the result is error-free; state exactly what was verified.
+- Stage 1: contract confirmed, decision log seeded, spec copied read-only
+- Stage 2: foundation — runtimes, linting, testing, health endpoint, CI
+- Stage 3: identity and authorization — users, sessions, OTP, CSRF, audit
+- Stage 4: workflow slices — quotation through collection
+- Stage 5: documents and demonstration data
+
+## Final report
+
+Per the acceptance matrix, the implementation is done only when every check
+passes and we record:
+
+- Files changed and decisions made
+- Commands run and their results
+- Tests not run and why
+- Known limitations and follow-up work
+- The exact commit or branch containing the implementation
+
+Don't claim the result is error-free. State exactly what was verified.

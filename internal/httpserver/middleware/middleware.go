@@ -1,6 +1,5 @@
-// Package middleware contains HTTP middleware: correlation id, panic recovery,
-// timeouts, and security headers. It implements the redaction, security, and
-// reliability requirements of docs/spec/03-security-and-privacy.md.
+// Package middleware contains HTTP middleware: correlation IDs, panic
+// recovery, timeouts, and security headers.
 package middleware
 
 import (

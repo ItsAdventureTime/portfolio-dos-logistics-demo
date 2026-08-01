@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 
-test.describe('Stage 2 smoke', () => {
+test.describe('Smoke tests', () => {
   test('home page loads with no a11y violations at 1440x900', async ({ page }) => {
     await page.goto('/')
     await expect(page.getByRole('heading', { name: /DOS FreightFlow Control/i })).toBeVisible()

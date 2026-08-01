@@ -1,15 +1,15 @@
 @import 'tailwindcss';
 
 /*
- * DOS FreightFlow Control — semantic token layer.
+ * DOS FreightFlow Control — Semantic Token Layer
  *
- * Derived from the approved DOS brand direction (blue-to-cyan-to-violet on a
- * dark navy foundation) per docs/spec/08-design-guidelines.md. Token families:
- * brand, action, focus, status, surface, content, border.
+ * Derived from the approved DOS brand direction: blue-to-cyan-to-violet on a
+ * dark navy foundation. Token families: brand, action, focus, status,
+ * surface, content, border.
  *
- * Uses HSL channels in shadcn-style conventions so Tailwind can compose
- * opacity via hsl(var(--token) / <alpha>). Status colors are always paired
- * with text/icon/shape — never color alone.
+ * HSL channels in shadcn-style conventions so Tailwind can compose opacity
+ * via hsl(var(--token) / <alpha>). Status colors always pair with text or
+ * icons — never color alone.
  */
 
 @theme {

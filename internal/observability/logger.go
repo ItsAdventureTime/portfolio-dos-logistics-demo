@@ -1,8 +1,7 @@
-// Package observability provides structured logging with secret redaction and
-// correlation identifiers. It implements the logging requirements of
-// docs/spec/03-security-and-privacy.md: structured logs, correlation IDs that
-// do not contain secrets, and redaction of credentials, cookies, authorization
-// headers, emails, OTPs, document names, and customer data.
+// Package observability provides structured logging with secret redaction
+// and correlation identifiers. Logs are JSON-formatted, and sensitive values
+// (passwords, tokens, cookies, auth headers, emails, OTPs, document names,
+// customer data) are replaced with [REDACTED] before they reach the output.
 package observability
 
 import (

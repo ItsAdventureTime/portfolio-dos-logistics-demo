@@ -1,8 +1,7 @@
 // Package documents handles safe document upload validation and private
-// storage. Per docs/spec/03-security-and-privacy.md:
-//   - Validate uploaded file size, type, extension, content, and storage key.
-//   - Keep private files behind authenticated authorization checks.
-//   - Reject unsafe or oversized content.
+// storage. Uploads are checked for size, file type, extension, content
+// sniff, and storage-key safety. Files are served behind authenticated
+// authorization checks — never publicly.
 package documents
 
 import (

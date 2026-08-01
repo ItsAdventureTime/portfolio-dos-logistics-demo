@@ -1,5 +1,5 @@
-// Package domain defines the core business types for identity and audit.
-// These types are stack-agnostic — they do not depend on any specific
+// Package domain defines the core business types for identity, audit, and
+// workflow records. These types are stack-agnostic — they depend on no
 // transport, database driver, or framework.
 package domain
 
@@ -14,9 +14,9 @@ type UserID string
 type SessionID string
 
 // RolePreview represents the operating view the Administrator may preview.
-// Per docs/spec/01-product-requirements.md, role preview changes the visible
-// navigation and allowed workflow actions. It does NOT change the
-// authenticated identity, audit actor, or server-side access decision.
+// Role preview changes the visible navigation and allowed workflow actions.
+// It does not change the authenticated identity, the audit actor, or the
+// server-side access decision.
 type RolePreview string
 
 const (

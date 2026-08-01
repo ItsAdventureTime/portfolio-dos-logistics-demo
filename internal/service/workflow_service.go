@@ -73,7 +73,7 @@ func NewWorkflowService(
 // --- Slice 2: Budget Request ---
 
 // CreateBudgetRequest creates a funding request linked to an accepted quotation.
-// Per docs/spec/02: "A budget request must link to an accepted quotation and a client."
+// A budget request must link to an accepted quotation and a client.
 func (s *WorkflowService) CreateBudgetRequest(ctx context.Context, actor domain.UserID, quotationID domain.QuotationID, clientID domain.ClientID, currencyCode, purpose string, amountCents int64) (*domain.BudgetRequest, error) {
 	corrID := observability.CorrelationFrom(ctx)
 
@@ -191,7 +191,7 @@ func (s *WorkflowService) TransitionBudgetRequest(ctx context.Context, id domain
 
 // CreateDisbursement creates a disbursement linked to an approved budget request
 // and an approved funding source.
-// Per docs/spec/02: "A disbursement must reference an approved request and an approved funding source."
+// A disbursement must reference an approved request and an approved funding source.
 func (s *WorkflowService) CreateDisbursement(ctx context.Context, actor domain.UserID, budgetReqID domain.BudgetRequestID, fundingSourceID domain.FundingSourceID, amountCents int64, currencyCode, refNum, notes string) (*domain.Disbursement, error) {
 	corrID := observability.CorrelationFrom(ctx)
 
@@ -289,8 +289,8 @@ func (s *WorkflowService) TransitionDisbursement(ctx context.Context, id domain.
 // --- Slice 5: Liquidation ---
 
 // CreateLiquidation creates a liquidation for a disbursement.
-// Per docs/spec/02: "Liquidation must reconcile released funds with actual spending
-// and retain variance evidence."
+// Liquidation must reconcile released funds with actual spending
+// and retain variance evidence.
 func (s *WorkflowService) CreateLiquidation(ctx context.Context, actor domain.UserID, disbursementID domain.DisbursementID, releasedAmount int64) (*domain.Liquidation, error) {
 	corrID := observability.CorrelationFrom(ctx)
 
@@ -391,7 +391,7 @@ func (s *WorkflowService) CloseLiquidation(ctx context.Context, id domain.Liquid
 // --- Slice 6: Billing ---
 
 // CreateBillingRecord creates a new billing record in draft status.
-// Per docs/spec/02: "Billing must follow the required approval path before finalization."
+// Billing must follow the required approval path before finalization.
 func (s *WorkflowService) CreateBillingRecord(ctx context.Context, actor domain.UserID, clientID domain.ClientID, currencyCode string, lines []BillingLineInput, budgetReqID *domain.BudgetRequestID) (*domain.BillingRecord, error) {
 	corrID := observability.CorrelationFrom(ctx)
 
@@ -446,8 +446,8 @@ func (s *WorkflowService) CreateBillingRecord(ctx context.Context, actor domain.
 }
 
 // TransitionBilling transitions a billing record with optimistic concurrency.
-// Per docs/spec/02: "A finalized financial record must not be edited in place;
-// use a controlled replacement or void process."
+// A finalized financial record must not be edited in place;
+// use a controlled replacement or void process.
 func (s *WorkflowService) TransitionBilling(ctx context.Context, id domain.BillingRecordID, target domain.BillingStatus, expectedVersion int, actor domain.UserID) (*domain.BillingRecord, error) {
 	corrID := observability.CorrelationFrom(ctx)
 
@@ -499,7 +499,7 @@ func (s *WorkflowService) TransitionBilling(ctx context.Context, id domain.Billi
 }
 
 // ReplaceBilling creates a replacement billing record for a finalized one.
-// Per docs/spec/02: "use a controlled replacement or void process."
+// use a controlled replacement or void process.
 func (s *WorkflowService) ReplaceBilling(ctx context.Context, actor domain.UserID, originalID domain.BillingRecordID, expectedVersion int, currencyCode string, lines []BillingLineInput) (*domain.BillingRecord, error) {
 	original, err := s.billing.GetByID(ctx, originalID)
 	if err != nil || original == nil {
@@ -566,7 +566,7 @@ func (s *WorkflowService) RecordClientPayment(ctx context.Context, actor domain.
 }
 
 // AllocatePayment allocates a payment to a billing record.
-// Per docs/spec/02: "Client payments may allocate only to billing records for the selected client."
+// Client payments may allocate only to billing records for the selected client.
 func (s *WorkflowService) AllocatePayment(ctx context.Context, actor domain.UserID, paymentID domain.ClientPaymentID, billingID domain.BillingRecordID, amountCents int64) (*domain.BillingAllocation, error) {
 	corrID := observability.CorrelationFrom(ctx)
 

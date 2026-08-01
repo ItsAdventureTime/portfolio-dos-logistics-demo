@@ -1,6 +1,4 @@
-// Package httpserver wires the Chi router, middleware, and the health
-// endpoints. It implements the health-check requirement of
-// docs/spec/05-acceptance-matrix.md.
+// Package httpserver wires the Chi router, middleware, and health endpoints.
 package httpserver
 
 import (

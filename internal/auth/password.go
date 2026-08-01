@@ -1,6 +1,6 @@
 // Package auth implements password hashing (Argon2id), OTP generation and
-// verification (TOTP-style 6-digit), session token generation, and CSRF token
-// helpers. Per ADR-004, all dependencies are MIT/BSD/Apache-licensed.
+// verification (RFC 6238 TOTP), session token generation, and CSRF token
+// helpers. All dependencies are MIT, BSD, or Apache-2.0 licensed.
 package auth
 
 import (
@@ -55,9 +55,9 @@ func NeedsRehash(encodedHash string) bool {
 	return false
 }
 
-// DummyHash returns a pre-computed hash so that login timing is equalized
-// even when the username does not exist (per docs/spec/01: neutral auth
-// errors that do not reveal whether an account exists).
+// DummyHash returns a pre-computed hash so that login timing stays consistent
+// even when the username doesn't exist. This keeps auth errors neutral — the
+// caller can't tell whether the account was found.
 func DummyHash() string {
 	salt := make([]byte, argon2SaltLength)
 	for i := range salt {

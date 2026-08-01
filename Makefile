@@ -1,4 +1,4 @@
-.PHONY: build test test-unit test-integration lint vet typecheck fmt migrate-up migrate-down migrate-status run dev web-dev web-build web-test web-lint web-typecheck secret-scan all
+.PHONY: build test test-unit test-integration lint vet typecheck fmt migrate-up migrate-down migrate-status run web-dev web-build web-test web-lint web-typecheck secret-scan all
 
 DEV := ./scripts/dos-dev
 
@@ -36,8 +36,6 @@ migrate-down:
 migrate-status:
 	$(DEV) goose -dir internal/store/migrations "$(DATABASE_URL)" status
 
-# Run API locally on host (requires Go installed on host, or use:
-#   podman run --rm -v $(PWD):/workspace -p 8080:8080 golang:1.26-alpine go run ./cmd/api)
 run:
 	go run ./cmd/api
 

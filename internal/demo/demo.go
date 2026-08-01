@@ -1,12 +1,8 @@
 // Package demo provides fictional demonstration fixtures and a controlled
-// reset that removes only synthetic demonstration records.
-//
-// Per docs/spec/01-product-requirements.md:
-//   - Use fictional companies, people, shipments, amounts, and documents.
-//   - Mark the environment as a demonstration.
-//   - Provide a controlled reset for demonstration records only.
-//   - Never include customer data, production credentials, private URLs,
-//     private IP addresses, or confidential business records.
+// reset that removes only synthetic demonstration records. All fixture
+// emails use the .example TLD. All amounts are synthetic. No customer data,
+// production credentials, or confidential business records appear anywhere
+// in the fixtures.
 package demo
 
 import (
@@ -155,8 +151,8 @@ func IsDemoRecord(id string) bool {
 	return len(id) >= len(DemoPrefix) && id[:len(DemoPrefix)] == DemoPrefix
 }
 
-// ResetService provides a controlled reset that removes only synthetic
-// demonstration records. It never touches non-demo data.
+// ResetService provides a controlled reset that removes only demo-prefixed
+// records. Non-demo data is never touched.
 type ResetService struct {
 	log *slog.Logger
 }
@@ -175,7 +171,8 @@ type ResetResult struct {
 }
 
 // Reset removes only demo-prefixed records. The caller provides cleanup
-// functions for each entity type. Non-demo records are never touched.
+// functions for each entity type, and only records whose IDs start with
+// "demo-" are removed.
 func (s *ResetService) Reset(
 	ctx context.Context,
 	actor domain.UserID,

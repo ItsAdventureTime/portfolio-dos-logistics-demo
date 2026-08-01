@@ -1,6 +1,6 @@
-// Package repository defines the storage interfaces (consumer-owned). The
-// service layer depends on these interfaces; the concrete pgx adapters live
-// in internal/store. This keeps business logic independent of the database.
+// Package repository defines the storage interfaces that the service layer
+// depends on. The concrete pgx adapters live in internal/store. This
+// separation keeps business logic independent of the database.
 package repository
 
 import (
@@ -37,7 +37,7 @@ type EmailChallengeRepository interface {
 }
 
 // AuditEventRepository writes append-only audit events. There is no Update
-// or Delete method — by design.
+// or Delete method — that's intentional.
 type AuditEventRepository interface {
 	Create(ctx context.Context, e *domain.AuditEvent) error
 }
