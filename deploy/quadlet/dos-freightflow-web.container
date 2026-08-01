@@ -2,6 +2,8 @@
 Description=DOS FreightFlow Control Web (rootless Podman)
 After=dos-freightflow-api.service
 Wants=dos-freightflow-api.service
+After=network-online.target
+Wants=network-online.target
 
 [Container]
 Image=dos-freightflow-web:latest
@@ -11,6 +13,7 @@ HealthCmd=wget -qO- http://127.0.0.1:8080/ || exit 1
 HealthInterval=30s
 HealthRetries=3
 HealthTimeout=5s
+HealthStartPeriod=5s
 NoNewPrivileges=true
 DropCapability=ALL
 ReadOnly=true
@@ -18,6 +21,8 @@ Tmpfs=/tmp:rw,size=64m
 PidsLimit=128
 Memory=256m
 CPUShares=256
+PodmanArgs=--security-opt label=disable
+Network=pasta
 
 [Service]
 Restart=always

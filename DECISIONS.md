@@ -302,7 +302,13 @@ to loopback only.
 
 No root daemon, per-service user identity, native journald and health-check
 integration. The Quadlet units use `DropCapability=ALL`, `ReadOnly=true`,
-tmpfs `/tmp`, and resource limits — matching the 2026 hardening baseline.
+`Tmpfs=/tmp`, `NoNewPrivileges=true`, `--security-opt label=disable`, and
+resource limits — matching the 2026 hardening baseline.
+
+Networking uses `pasta` (from the `passt` package) instead of the older
+`slirp4netns`. Pasta is the recommended rootless network backend in current
+Podman releases: better single-connection throughput, native IPv6, no NAT
+by default, and source-IP-preserving port forwarding.
 
 The one gotcha: `enable-linger` must be set or services die when the user
 logs out. On Alpine, a Go static binary sidesteps musl compatibility issues;

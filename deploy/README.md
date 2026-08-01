@@ -11,6 +11,7 @@ Start PostgreSQL, then build and run the API and web containers:
 ```sh
 # Start PostgreSQL on loopback
 podman run -d --name dos-freightflow-postgres \
+  --network pasta \
   -e POSTGRES_DB=dosfreightflow \
   -e POSTGRES_USER=dos \
   -e POSTGRES_PASSWORD=dos \
@@ -23,6 +24,8 @@ podman build -t dos-freightflow-web:latest -f deploy/images/Dockerfile.web .
 
 # Run the API on loopback
 podman run -d --name dos-freightflow-api \
+  --network pasta \
+  --security-opt label=disable \
   -e APP_ENV=development \
   -e HTTP_ADDR=0.0.0.0:8080 \
   -e DATABASE_URL="postgres://dos:dos@10.0.2.2:5432/dosfreightflow?sslmode=disable" \
@@ -38,6 +41,8 @@ podman exec dos-freightflow-api /app/migrate up
 
 # Run the web client on loopback
 podman run -d --name dos-freightflow-web \
+  --network pasta \
+  --security-opt label=disable \
   -p 127.0.0.1:8082:8080 \
   dos-freightflow-web:latest
 ```
@@ -68,15 +73,30 @@ The web image serves the built React bundle via Caddy.
 ```sh
 sudo useradd -m -s /bin/bash dos
 sudo loginctl enable-linger dos
-sudo apt-get install -y podman uidmap slirp4netns fuse-overlayfs
+sudo apt-get install -y podman uidmap passt fuse-overlayfs
 ```
 
 `enable-linger` keeps services running after logout — without it, all
 containers stop when the user session ends.
 
-### 2. Create secret files
+`passt` provides the pasta rootless network backend, which is the
+recommended replacement for slirp4netns in current Podman releases. It
+offers better single-connection throughput, native IPv6 support, and
+source-IP-preserving port forwarding.
+
+### 2. Configure pasta as the rootless network
 
 As the `dos` user:
+
+```sh
+mkdir -p ~/.config/containers
+cat > ~/.config/containers/containers.conf <<'EOF'
+[network]
+default_rootless_network_cmd = "pasta"
+EOF
+```
+
+### 3. Create secret files
 
 ```sh
 mkdir -p ~/.config/dos-freightflow
@@ -94,33 +114,47 @@ chmod 600 ~/.config/dos-freightflow/api.env
 chmod 600 ~/.config/dos-freightflow/postgres.env
 ```
 
-### 3. Install Quadlet units
+### 4. Install Quadlet units
 
 ```sh
 mkdir -p ~/.config/containers/systemd
 cp deploy/quadlet/*.container ~/.config/containers/systemd/
 systemctl --user daemon-reload
+
+# Start in dependency order: PostgreSQL first, then API, then web
 systemctl --user enable --now dos-freightflow-postgres.service
 systemctl --user enable --now dos-freightflow-api.service
 systemctl --user enable --now dos-freightflow-web.service
 ```
 
-### 4. Run migrations
+The API unit has `After=dos-freightflow-postgres.service` so systemd
+starts it only after PostgreSQL is up. The web unit has
+`After=dos-freightflow-api.service` for the same reason.
+
+### 5. Run migrations
 
 ```sh
 podman exec dos-freightflow-api /app/migrate up
 ```
 
-### 5. Verify
+### 6. Verify
 
 ```sh
+systemctl --user status dos-freightflow-postgres.service
+systemctl --user status dos-freightflow-api.service
+systemctl --user status dos-freightflow-web.service
+
 curl http://127.0.0.1:8081/healthz
 curl http://127.0.0.1:8082/
+
+podman ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 ```
 
-### 6. Pin image digests
+### 7. Pin image digests
 
-After all checks pass, pin architecture-specific digests:
+After all checks pass, pin architecture-specific digests. Using `:latest`
+in production is an anti-pattern — pin a specific digest so deployments
+are reproducible and rollbacks are clean.
 
 ```sh
 podman pull dos-freightflow-api:latest
@@ -147,13 +181,32 @@ Database migrations roll back with:
 podman exec dos-freightflow-api /app/migrate down
 ```
 
+## Observability
+
+journald captures stdout/stderr from all container units automatically.
+View logs with:
+
+```sh
+journalctl --user -u dos-freightflow-api.service -f
+journalctl --user -u dos-freightflow-web.service -f
+journalctl --user -u dos-freightflow-postgres.service -f
+```
+
+If you need log forwarding, use Fluent Bit or Vector to ship journald
+entries to your central log store.
+
 ## Security checklist
 
 - All containers run as non-root users
-- `DropCapability=ALL`, `ReadOnly=true`, `Tmpfs=/tmp` on all units
+- `DropCapability=ALL` — no Linux capabilities
+- `ReadOnly=true` with `Tmpfs=/tmp` — read-only root filesystem
+- `NoNewPrivileges=true` — no setuid escalation
+- `--security-opt label=disable` — avoids SELinux label conflicts in rootless mode
+- `Network=pasta` — modern rootless networking with no NAT overhead
 - Secrets in `chmod 600` env files, never committed
 - Caddy sets HSTS, nosniff, DENY frame, no-referrer
 - API binds to loopback only — no direct public access
-- Health checks on all services
+- Health checks on all services with `HealthStartPeriod` grace time
 - Image digests pinned after acceptance checks pass
+- `enable-linger` set so services survive logout
 - No Docker daemon — rootless Podman only

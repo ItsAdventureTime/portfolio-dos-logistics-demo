@@ -1,0 +1,9 @@
+# Podman rootless configuration for DOS FreightFlow Control.
+# Install to: ~/.config/containers/containers.conf
+#
+# Pasta is the recommended rootless network backend for current Podman
+# releases. It provides better throughput than slirp4netns, native IPv6
+# support, no NAT by default, and source-IP-preserving port forwarding.
+
+[network]
+default_rootless_network_cmd = "pasta"

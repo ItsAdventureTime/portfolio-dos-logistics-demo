@@ -15,11 +15,14 @@ HealthCmd=pg_isready -U dos -d dosfreightflow
 HealthInterval=15s
 HealthRetries=5
 HealthTimeout=5s
+HealthStartPeriod=30s
 NoNewPrivileges=true
 DropCapability=ALL
 Tmpfs=/tmp:rw,size=64m
 PidsLimit=256
 Memory=512m
+PodmanArgs=--security-opt label=disable
+Network=pasta
 
 [Service]
 Restart=always

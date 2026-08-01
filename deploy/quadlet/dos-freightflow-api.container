@@ -1,5 +1,7 @@
 [Unit]
 Description=DOS FreightFlow Control API (rootless Podman)
+After=dos-freightflow-postgres.service
+Wants=dos-freightflow-postgres.service
 After=network-online.target
 Wants=network-online.target
 
@@ -14,6 +16,7 @@ HealthCmd=wget -qO- http://127.0.0.1:8080/healthz || exit 1
 HealthInterval=30s
 HealthRetries=3
 HealthTimeout=5s
+HealthStartPeriod=10s
 Volume=%h/data/dos-freightflow:/app/data:Z
 NoNewPrivileges=true
 DropCapability=ALL
@@ -22,6 +25,8 @@ Tmpfs=/tmp:rw,size=128m
 PidsLimit=256
 Memory=512m
 CPUShares=512
+PodmanArgs=--security-opt label=disable
+Network=pasta
 
 [Service]
 Restart=always
