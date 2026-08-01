@@ -316,5 +316,7 @@ full build and startup checks pass, Caddy reverse proxy with HSTS.
 
 ### Rollback
 
-If Podman proves unstable on the target VPS, fall back to Docker Compose
-with non-root user mapping. Caddy stays the same. Record as ADR-007a.
+If Podman proves unstable on the target VPS, troubleshoot the Quadlet units
+and rootless configuration first. Docker is not a fallback option for this
+project — rootless Podman is the only container runtime. Record any
+configuration fix as ADR-007a.

@@ -1,26 +1,57 @@
 # Deployment Guide
 
-This guide covers building images, running services locally with
-docker-compose, and deploying to a VPS with rootless Podman Quadlets.
+This guide covers building images, running services locally with Podman,
+and deploying to a VPS with rootless Podman Quadlets. Docker is not used
+anywhere in this project.
 
-## Local development with docker-compose
+## Local development with Podman
+
+Start PostgreSQL, then build and run the API and web containers:
 
 ```sh
-docker compose up --build
+# Start PostgreSQL on loopback
+podman run -d --name dos-freightflow-postgres \
+  -e POSTGRES_DB=dosfreightflow \
+  -e POSTGRES_USER=dos \
+  -e POSTGRES_PASSWORD=dos \
+  -p 127.0.0.1:5432:5432 \
+  docker.io/library/postgres:17-alpine
+
+# Build images
+podman build -t dos-freightflow-api:latest -f deploy/images/Dockerfile.api .
+podman build -t dos-freightflow-web:latest -f deploy/images/Dockerfile.web .
+
+# Run the API on loopback
+podman run -d --name dos-freightflow-api \
+  -e APP_ENV=development \
+  -e HTTP_ADDR=0.0.0.0:8080 \
+  -e DATABASE_URL="postgres://dos:dos@10.0.2.2:5432/dosfreightflow?sslmode=disable" \
+  -e SESSION_SECRET="dev-session-secret-32-bytes-minimum-length" \
+  -e OTP_SECRET="dev-otp-secret-32-bytes-minimum-length-here" \
+  -e APP_DEV_CODE_VISIBLE=true \
+  -e LOG_LEVEL=debug \
+  -p 127.0.0.1:8081:8080 \
+  dos-freightflow-api:latest
+
+# Run migrations
+podman exec dos-freightflow-api /app/migrate up
+
+# Run the web client on loopback
+podman run -d --name dos-freightflow-web \
+  -p 127.0.0.1:8082:8080 \
+  dos-freightflow-web:latest
 ```
-
-This starts three services on loopback:
-
-- PostgreSQL on `127.0.0.1:5432`
-- API on `127.0.0.1:8081`
-- Web (Caddy) on `127.0.0.1:8082`
 
 The API health check is at `http://127.0.0.1:8081/healthz`.
 The web client is at `http://127.0.0.1:8082`.
 
-## Building images for production
+To stop and clean up:
 
-Build from the repo root:
+```sh
+podman rm -f dos-freightflow-web dos-freightflow-api dos-freightflow-postgres
+```
+
+## Building images for production
 
 ```sh
 podman build -t dos-freightflow-api:latest -f deploy/images/Dockerfile.api .
@@ -30,7 +61,7 @@ podman build -t dos-freightflow-web:latest -f deploy/images/Dockerfile.web .
 The API image is a static Go binary on Alpine, running as a non-root user.
 The web image serves the built React bundle via Caddy.
 
-## VPS deployment with Podman Quadlets
+## VPS deployment with rootless Podman Quadlets
 
 ### 1. Prepare the host
 
@@ -125,3 +156,4 @@ podman exec dos-freightflow-api /app/migrate down
 - API binds to loopback only — no direct public access
 - Health checks on all services
 - Image digests pinned after acceptance checks pass
+- No Docker daemon — rootless Podman only
