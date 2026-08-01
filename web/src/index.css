@@ -1,0 +1,90 @@
+@import 'tailwindcss';
+
+/*
+ * DOS FreightFlow Control — semantic token layer.
+ *
+ * Derived from the approved DOS brand direction (blue-to-cyan-to-violet on a
+ * dark navy foundation) per docs/spec/08-design-guidelines.md. Token families:
+ * brand, action, focus, status, surface, content, border.
+ *
+ * Uses HSL channels in shadcn-style conventions so Tailwind can compose
+ * opacity via hsl(var(--token) / <alpha>). Status colors are always paired
+ * with text/icon/shape — never color alone.
+ */
+
+@theme {
+  --color-brand: hsl(225 80% 55%);
+  --color-brand-foreground: hsl(0 0% 100%);
+
+  --color-action: hsl(190 90% 45%);
+  --color-action-foreground: hsl(0 0% 100%);
+
+  --color-focus: hsl(180 90% 50%);
+
+  --color-status-success: hsl(142 60% 40%);
+  --color-status-warning: hsl(38 90% 50%);
+  --color-status-error: hsl(0 75% 55%);
+  --color-status-info: hsl(210 80% 55%);
+
+  --color-surface: hsl(225 30% 12%);
+  --color-surface-elevated: hsl(225 25% 18%);
+  --color-surface-panel: hsl(225 22% 22%);
+
+  --color-content: hsl(220 15% 92%);
+  --color-content-muted: hsl(220 10% 65%);
+  --color-content-inverse: hsl(225 30% 12%);
+
+  --color-border: hsl(225 15% 28%);
+  --color-border-interactive: hsl(190 60% 45%);
+
+  --radius-card: 0.5rem;
+  --font-display: 'Inter', sans-serif;
+}
+
+:root {
+  --brand: 225 80% 55%;
+  --brand-foreground: 0 0% 100%;
+
+  --action: 190 90% 45%;
+  --action-foreground: 0 0% 100%;
+
+  --focus: 180 90% 50%;
+
+  --status-success: 142 60% 40%;
+  --status-warning: 38 90% 50%;
+  --status-error: 0 75% 55%;
+  --status-info: 210 80% 55%;
+
+  --surface: 225 30% 12%;
+  --surface-elevated: 225 25% 18%;
+  --surface-panel: 225 22% 22%;
+
+  --content: 220 15% 92%;
+  --content-muted: 220 10% 65%;
+  --content-inverse: 225 30% 12%;
+
+  --border: 225 15% 28%;
+  --border-interactive: 190 60% 45%;
+
+  --radius: 0.5rem;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --surface: 0 0% 100%;
+    --surface-elevated: 220 20% 96%;
+    --surface-panel: 220 15% 90%;
+    --content: 225 30% 12%;
+    --content-muted: 225 10% 45%;
+    --content-inverse: 0 0% 100%;
+    --border: 225 15% 85%;
+  }
+}
+
+body {
+  margin: 0;
+  background: hsl(var(--surface));
+  color: hsl(var(--content));
+  font-family: var(--font-display);
+  -webkit-font-smoothing: antialiased;
+}

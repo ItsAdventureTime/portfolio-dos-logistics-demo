@@ -1,0 +1,56 @@
+// Package main is the composition root for the API server. It loads config,
+// builds the server, and handles graceful shutdown on SIGINT/SIGTERM.
+package main
+
+import (
+	"context"
+	"errors"
+	"log/slog"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+
+	"github.com/ItsAdventureTime/portfolio-dos-logistics-demo/internal/config"
+	"github.com/ItsAdventureTime/portfolio-dos-logistics-demo/internal/httpserver"
+	"github.com/ItsAdventureTime/portfolio-dos-logistics-demo/internal/observability"
+)
+
+func main() {
+	if err := run(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		slog.Error("fatal", "error", err)
+		os.Exit(1)
+	}
+}
+
+func run() error {
+	cfg, err := config.Load()
+	if err != nil {
+		return err
+	}
+	log := observability.Logger(cfg.LogLevel)
+	log.Info("starting", "env", cfg.Env, "addr", cfg.HTTPAddr)
+
+	srv := httpserver.New(cfg, log)
+
+	errCh := make(chan error, 1)
+	go func() {
+		if err := srv.Start(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			errCh <- err
+		}
+	}()
+
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+
+	select {
+	case err := <-errCh:
+		return err
+	case <-sigCh:
+		log.Info("shutdown signal received")
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), cfg.ShutdownTimeout)
+	defer cancel()
+	return srv.Shutdown(ctx)
+}
