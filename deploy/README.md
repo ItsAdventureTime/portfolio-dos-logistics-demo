@@ -69,15 +69,15 @@ chmod 600 ~/.config/dos-freightflow/postgres.env
 mkdir -p ~/.config/containers/systemd
 cp deploy/quadlet/*.container ~/.config/containers/systemd/
 systemctl --user daemon-reload
-systemctl --user enable --now dos-postgres.service
-systemctl --user enable --now dos-api.service
-systemctl --user enable --now dos-web.service
+systemctl --user enable --now dos-freightflow-postgres.service
+systemctl --user enable --now dos-freightflow-api.service
+systemctl --user enable --now dos-freightflow-web.service
 ```
 
 ### 4. Run migrations
 
 ```sh
-podman exec dos-api /app/migrate up
+podman exec dos-freightflow-api /app/migrate up
 ```
 
 ### 5. Verify
@@ -96,7 +96,7 @@ podman pull dos-freightflow-api:latest
 DIGEST=$(podman inspect --format '{{.Digest}}' dos-freightflow-api:latest)
 # Update the Quadlet Image= line to dos-freightflow-api@sha256:$DIGEST
 systemctl --user daemon-reload
-systemctl --user restart dos-api.service
+systemctl --user restart dos-freightflow-api.service
 ```
 
 ## Rollback
@@ -107,13 +107,13 @@ To roll back to a previous version:
 podman pull dos-freightflow-api:PREVIOUS_TAG
 # Update the Quadlet Image= line
 systemctl --user daemon-reload
-systemctl --user restart dos-api.service
+systemctl --user restart dos-freightflow-api.service
 ```
 
 Database migrations roll back with:
 
 ```sh
-podman exec dos-api /app/migrate down
+podman exec dos-freightflow-api /app/migrate down
 ```
 
 ## Security checklist

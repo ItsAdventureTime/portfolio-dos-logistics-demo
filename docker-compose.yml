@@ -1,6 +1,7 @@
 services:
   postgres:
     image: postgres:17-alpine
+    container_name: dos-freightflow-postgres
     environment:
       POSTGRES_DB: dosfreightflow
       POSTGRES_USER: dos
@@ -19,6 +20,7 @@ services:
     build:
       context: .
       dockerfile: deploy/images/Dockerfile.api
+    container_name: dos-freightflow-api
     environment:
       APP_ENV: development
       HTTP_ADDR: "0.0.0.0:8080"
@@ -43,6 +45,7 @@ services:
     build:
       context: .
       dockerfile: deploy/images/Dockerfile.web
+    container_name: dos-freightflow-web
     ports:
       - "127.0.0.1:8082:8080"
     depends_on:

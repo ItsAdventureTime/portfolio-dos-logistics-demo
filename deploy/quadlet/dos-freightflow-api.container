@@ -5,7 +5,7 @@ Wants=network-online.target
 
 [Container]
 Image=dos-freightflow-api:latest
-ContainerName=dos-api
+ContainerName=dos-freightflow-api
 PublishPort=127.0.0.1:8081:8080
 Environment=APP_ENV=production
 Environment=HTTP_ADDR=0.0.0.0:8080
