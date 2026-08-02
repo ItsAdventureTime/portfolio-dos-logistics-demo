@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, type UseFormRegister } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { api } from '../api/client'
@@ -30,9 +30,10 @@ interface FieldProps {
   inputMode?: 'numeric' | 'text' | 'email'
   defaultValue?: string
   error?: string
+  register: UseFormRegister<Record<string, unknown>>
 }
 
-function FieldInput({ label, name, type = 'text', placeholder, isRequired, description, autoComplete, inputMode, defaultValue, error }: FieldProps) {
+function FieldInput({ label, name, type = 'text', placeholder, isRequired, description, autoComplete, inputMode, defaultValue, error, register }: FieldProps) {
   return (
     <TextField name={name} isInvalid={!!error} className="flex flex-col gap-1.5">
       <Label className="text-sm font-medium text-[hsl(var(--content))]">
@@ -45,6 +46,7 @@ function FieldInput({ label, name, type = 'text', placeholder, isRequired, descr
         autoComplete={autoComplete}
         inputMode={inputMode}
         defaultValue={defaultValue}
+        {...register(name)}
       />
       {description && !error && <span className="text-xs text-[hsl(var(--content-muted))]">{description}</span>}
       {error && <span role="alert" className="text-xs text-[hsl(var(--status-error))]">{error}</span>}
@@ -104,6 +106,7 @@ export function LoginPage({ onSuccess }: { onSuccess: () => void }) {
                 isRequired
                 autoComplete="username"
                 placeholder="admin or admin@company.example"
+                register={loginForm.register as UseFormRegister<Record<string, unknown>>}
               />
               <FieldInput
                 label="Password"
@@ -112,6 +115,7 @@ export function LoginPage({ onSuccess }: { onSuccess: () => void }) {
                 isRequired
                 autoComplete="current-password"
                 error={error}
+                register={loginForm.register as UseFormRegister<Record<string, unknown>>}
               />
               {Object.keys(loginForm.formState.errors).length > 0 && !error && (
                 <div role="alert" className="rounded-lg bg-[hsl(var(--status-error))]/10 p-3 text-sm text-[hsl(var(--status-error))]">
@@ -136,6 +140,7 @@ export function LoginPage({ onSuccess }: { onSuccess: () => void }) {
                 isRequired
                 autoComplete="username"
                 defaultValue={identifier}
+                register={otpForm.register as UseFormRegister<Record<string, unknown>>}
               />
               <FieldInput
                 label="Verification code"
@@ -145,6 +150,7 @@ export function LoginPage({ onSuccess }: { onSuccess: () => void }) {
                 description="6-digit code"
                 inputMode="numeric"
                 error={error}
+                register={otpForm.register as UseFormRegister<Record<string, unknown>>}
               />
               <Button type="submit" isDisabled={otpForm.formState.isSubmitting}>
                 {otpForm.formState.isSubmitting ? 'Working…' : 'Verify and sign in'}
