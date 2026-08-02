@@ -41,24 +41,24 @@ export function Field({
       isRequired={isRequired}
       isInvalid={isInvalid}
       onChange={onChange}
-      className={`flex flex-col gap-1.5 ${className}`}
+      className={`flex flex-col gap-2 ${className}`}
     >
-      <Label className="text-sm font-medium text-[hsl(var(--content))]">
+      <Label className="text-sm font-medium text-[hsl(var(--text-01))]">
         {label}
-        {isRequired && <span className="ml-0.5 text-[hsl(var(--status-error))]" aria-hidden="true">*</span>}
+        {isRequired && <span className="ml-0.5 text-[hsl(var(--support-error))]" aria-hidden="true">*</span>}
       </Label>
       <RACInput
         placeholder={placeholder}
         autoComplete={autoComplete}
-        className="w-full rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--surface-elevated))] px-3 py-2 text-[hsl(var(--content))] placeholder:text-[hsl(var(--content-muted))] focus:outline-none focus:border-[hsl(var(--focus))] focus:ring-1 focus:ring-[hsl(var(--focus))] data-[invalid]:border-[hsl(var(--status-error))]"
+        className="w-full rounded-[var(--radius-sm)] border border-[hsl(var(--border-strong))] bg-[hsl(var(--ui-01))] px-3.5 py-2.5 text-sm text-[hsl(var(--text-01))] placeholder:text-[hsl(var(--text-03))] focus:outline-none focus:border-[hsl(var(--focus))] focus:ring-1 focus:ring-[hsl(var(--focus))] data-[invalid]:border-[hsl(var(--support-error))]"
       />
       {description && !isInvalid && (
-        <Text slot="description" className="text-xs text-[hsl(var(--content-muted))]">
+        <Text slot="description" className="text-xs text-[hsl(var(--text-03))]">
           {description}
         </Text>
       )}
       {errorMessage && (
-        <Text slot="errorMessage" className="text-xs text-[hsl(var(--status-error))]">
+        <Text slot="errorMessage" className="text-xs text-[hsl(var(--support-error))]">
           {errorMessage}
         </Text>
       )}
@@ -73,7 +73,7 @@ interface DOSInputProps extends InputProps {
 export function Input({ className = '', ...props }: DOSInputProps) {
   return (
     <RACInput
-      className={`w-full rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--surface-elevated))] px-3 py-2 text-[hsl(var(--content))] placeholder:text-[hsl(var(--content-muted))] focus:outline-none focus:border-[hsl(var(--focus))] focus:ring-1 focus:ring-[hsl(var(--focus))] data-[invalid]:border-[hsl(var(--status-error))] ${className}`}
+      className={`w-full rounded-[var(--radius-sm)] border border-[hsl(var(--border-strong))] bg-[hsl(var(--ui-01))] px-3.5 py-2.5 text-sm text-[hsl(var(--text-01))] placeholder:text-[hsl(var(--text-03))] focus:outline-none focus:border-[hsl(var(--focus))] focus:ring-1 focus:ring-[hsl(var(--focus))] data-[invalid]:border-[hsl(var(--support-error))] ${className}`}
       {...props}
     />
   )

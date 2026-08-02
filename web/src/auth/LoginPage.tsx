@@ -35,10 +35,10 @@ interface FieldProps {
 
 function FieldInput({ label, name, type = 'text', placeholder, isRequired, description, autoComplete, inputMode, defaultValue, error, register }: FieldProps) {
   return (
-    <TextField name={name} isInvalid={!!error} className="flex flex-col gap-1.5">
-      <Label className="text-sm font-medium text-[hsl(var(--content))]">
+    <TextField name={name} isInvalid={!!error} className="flex flex-col gap-2">
+      <Label className="text-sm font-medium text-[hsl(var(--text-01))]">
         {label}
-        {isRequired && <span className="ml-0.5 text-[hsl(var(--status-error))]" aria-hidden="true">*</span>}
+        {isRequired && <span className="ml-0.5 text-[hsl(var(--support-error))]" aria-hidden="true">*</span>}
       </Label>
       <Input
         type={type}
@@ -48,8 +48,8 @@ function FieldInput({ label, name, type = 'text', placeholder, isRequired, descr
         defaultValue={defaultValue}
         {...register(name)}
       />
-      {description && !error && <span className="text-xs text-[hsl(var(--content-muted))]">{description}</span>}
-      {error && <span role="alert" className="text-xs text-[hsl(var(--status-error))]">{error}</span>}
+      {description && !error && <span className="text-xs text-[hsl(var(--text-03))]">{description}</span>}
+      {error && <span role="alert" className="text-xs text-[hsl(var(--support-error))]">{error}</span>}
     </TextField>
   )
 }
@@ -90,15 +90,24 @@ export function LoginPage({ onSuccess }: { onSuccess: () => void }) {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[hsl(var(--surface))] px-4">
+    <div className="flex min-h-screen items-center justify-center bg-[hsl(var(--ui-background))] px-4">
       <div className="w-full max-w-sm">
-        <div className="mb-8 text-center">
-          <h1 className="text-2xl font-semibold text-[hsl(var(--content))]">DOS FreightFlow Control</h1>
-          <p className="mt-1 text-sm text-[hsl(var(--content-muted))]">Sign in to your workspace</p>
+        {/* DOS brand lockup */}
+        <div className="mb-8 flex flex-col items-center gap-4">
+          <img
+            src="/dos-mark.png"
+            alt="DOS"
+            className="h-12 w-12 rounded-[var(--radius-sm)]"
+          />
+          <div className="text-center">
+            <h1 className="text-lg font-semibold text-[hsl(var(--text-01))]">DOS FreightFlow Control</h1>
+            <p className="mt-0.5 text-sm text-[hsl(var(--text-03))]">DelegateOps Business Support Services</p>
+          </div>
         </div>
 
         {mode === 'login' ? (
-          <div className="rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--surface-elevated))] p-6">
+          <div className="rounded-[var(--radius-sm)] border border-[hsl(var(--border-subtle))] bg-[hsl(var(--ui-01))] p-6">
+            <p className="mb-5 text-sm text-[hsl(var(--text-02))]">Sign in to your workspace</p>
             <form onSubmit={loginForm.handleSubmit(handleLogin)} className="flex flex-col gap-4" noValidate>
               <FieldInput
                 label="Username or email"
@@ -118,19 +127,19 @@ export function LoginPage({ onSuccess }: { onSuccess: () => void }) {
                 register={loginForm.register as UseFormRegister<Record<string, unknown>>}
               />
               {Object.keys(loginForm.formState.errors).length > 0 && !error && (
-                <div role="alert" className="rounded-lg bg-[hsl(var(--status-error))]/10 p-3 text-sm text-[hsl(var(--status-error))]">
+                <div role="alert" className="rounded-[var(--radius-sm)] border border-[hsl(var(--support-error))]/30 bg-[hsl(var(--support-error))]/10 p-3 text-xs text-[hsl(var(--support-error))]">
                   Please correct the errors and try again.
                 </div>
               )}
               <Button type="submit" isDisabled={loginForm.formState.isSubmitting}>
-                {loginForm.formState.isSubmitting ? 'Working…' : 'Sign in'}
+                {loginForm.formState.isSubmitting ? 'Working...' : 'Sign in'}
               </Button>
             </form>
           </div>
         ) : (
-          <div className="rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--surface-elevated))] p-6">
-            <h2 className="mb-2 text-lg font-medium text-[hsl(var(--content))]">Verify your email</h2>
-            <p className="mb-4 text-sm text-[hsl(var(--content-muted))]">
+          <div className="rounded-[var(--radius-sm)] border border-[hsl(var(--border-subtle))] bg-[hsl(var(--ui-01))] p-6">
+            <h2 className="mb-1.5 text-sm font-semibold text-[hsl(var(--text-01))]">Verify your email</h2>
+            <p className="mb-5 text-sm text-[hsl(var(--text-03))]">
               A verification code was sent to the email on file{displayName ? `, ${displayName}` : ''}. Enter it below.
             </p>
             <form onSubmit={otpForm.handleSubmit(handleVerify)} className="flex flex-col gap-4" noValidate>
@@ -153,7 +162,7 @@ export function LoginPage({ onSuccess }: { onSuccess: () => void }) {
                 register={otpForm.register as UseFormRegister<Record<string, unknown>>}
               />
               <Button type="submit" isDisabled={otpForm.formState.isSubmitting}>
-                {otpForm.formState.isSubmitting ? 'Working…' : 'Verify and sign in'}
+                {otpForm.formState.isSubmitting ? 'Working...' : 'Verify and sign in'}
               </Button>
             </form>
             <Button variant="ghost" size="sm" className="mt-4" onPress={() => setMode('login')}>

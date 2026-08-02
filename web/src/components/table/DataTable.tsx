@@ -13,9 +13,18 @@ interface DataTableProps<T> {
   data: T[]
   caption?: string
   emptyMessage?: string
+  zebra?: boolean
+  density?: 'compact' | 'normal'
 }
 
-export function DataTable<T>({ columns, data, caption, emptyMessage = 'No records found.' }: DataTableProps<T>) {
+export function DataTable<T>({
+  columns,
+  data,
+  caption,
+  emptyMessage = 'No records found.',
+  zebra = true,
+  density = 'normal',
+}: DataTableProps<T>) {
   const [sorting, setSorting] = useState<SortingState>([])
 
   const table = useReactTable({
@@ -28,14 +37,16 @@ export function DataTable<T>({ columns, data, caption, emptyMessage = 'No record
   })
 
   const hasData = data.length > 0
+  const rowHeight = density === 'compact' ? 'py-2' : 'py-3.5'
+  const headerHeight = density === 'compact' ? 'py-2' : 'py-3'
 
   return (
-    <div className="w-full overflow-x-auto rounded-lg border border-[hsl(var(--border))]">
+    <div className="w-full overflow-x-auto rounded-[var(--radius-sm)] border border-[hsl(var(--border-subtle))] bg-[hsl(var(--ui-01))]">
       <table className="w-full text-sm" role="table">
         {caption && <caption className="sr-only">{caption}</caption>}
-        <thead className="bg-[hsl(var(--surface-panel))]">
+        <thead className="sticky top-0 z-10 bg-[hsl(var(--ui-03))]">
           {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id} className="border-b border-[hsl(var(--border))]">
+            <tr key={headerGroup.id} className="border-b border-[hsl(var(--border-subtle))]">
               {headerGroup.headers.map((header) => {
                 const sortDir = header.column.getIsSorted()
                 const isSortable = header.column.getCanSort()
@@ -43,7 +54,7 @@ export function DataTable<T>({ columns, data, caption, emptyMessage = 'No record
                   <th
                     key={header.id}
                     scope="col"
-                    className="px-4 py-3 text-left font-medium text-[hsl(var(--content-muted))]"
+                    className={`px-4 ${headerHeight} text-left font-semibold text-[hsl(var(--text-02))] whitespace-nowrap`}
                     aria-sort={sortDir === 'asc' ? 'ascending' : sortDir === 'desc' ? 'descending' : 'none'}
                   >
                     {header.isPlaceholder ? null : flexRender(
@@ -51,8 +62,8 @@ export function DataTable<T>({ columns, data, caption, emptyMessage = 'No record
                       header.getContext(),
                     )}
                     {isSortable && (
-                      <span className="ml-1 text-xs" aria-hidden="true">
-                        {sortDir === 'asc' ? '▲' : sortDir === 'desc' ? '▼' : '↕'}
+                      <span className="ml-1 inline-block text-xs text-[hsl(var(--text-03))]" aria-hidden="true">
+                        {sortDir === 'asc' ? '\u2191' : sortDir === 'desc' ? '\u2193' : '\u2195'}
                       </span>
                     )}
                   </th>
@@ -63,13 +74,13 @@ export function DataTable<T>({ columns, data, caption, emptyMessage = 'No record
         </thead>
         <tbody>
           {hasData ? (
-            table.getRowModel().rows.map((row) => (
+            table.getRowModel().rows.map((row, i) => (
               <tr
                 key={row.id}
-                className="border-b border-[hsl(var(--border))]/50 hover:bg-[hsl(var(--surface-panel))]/50 transition-colors"
+                className={`border-b border-[hsl(var(--border-subtle))]/60 transition-colors hover:bg-[hsl(var(--hover-row))] ${zebra && i % 2 === 1 ? 'bg-[hsl(var(--ui-02))]/50' : ''}`}
               >
                 {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="px-4 py-3 text-[hsl(var(--content))]">
+                  <td key={cell.id} className={`px-4 ${rowHeight} text-[hsl(var(--text-01))]`}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}
@@ -77,7 +88,7 @@ export function DataTable<T>({ columns, data, caption, emptyMessage = 'No record
             ))
           ) : (
             <tr>
-              <td colSpan={columns.length} className="px-4 py-8 text-center text-[hsl(var(--content-muted))]">
+              <td colSpan={columns.length} className="px-4 py-12 text-center text-sm text-[hsl(var(--text-03))]">
                 {emptyMessage}
               </td>
             </tr>

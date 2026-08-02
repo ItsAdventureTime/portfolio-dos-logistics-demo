@@ -1,90 +1,208 @@
 @import 'tailwindcss';
 
 /*
- * DOS FreightFlow Control: Semantic Token Layer
+ * DOS FreightFlow Control: Design Token System
  *
- * Derived from the approved DOS brand direction: blue-to-cyan-to-violet on a
- * dark navy foundation. Token families: brand, action, focus, status,
- * surface, content, border.
+ * Token naming follows IBM Carbon conventions (interactive-01, ui-01, text-01)
+ * with DOS brand colors derived from the approved DelegateOps artwork:
+ * blue-to-cyan-to-violet on a dark navy foundation.
  *
- * HSL channels in shadcn-style conventions so Tailwind can compose opacity
- * via hsl(var(--token) / <alpha>). Status colors always pair with text or
- * icons. Never color alone.
+ * Spacing follows the Carbon scale: 2, 4, 8, 12, 16, 24, 32, 48, 64px.
+ * Typography uses Inter (open-source, geometric, close to IBM Plex Sans).
+ * Status colors always pair with text or icons. Never color alone.
  */
 
 @theme {
-  --color-brand: hsl(225 80% 55%);
-  --color-brand-foreground: hsl(0 0% 100%);
+  /* Interactive / Brand */
+  --color-interactive-01: hsl(211 100% 50%);
+  --color-interactive-02: hsl(211 100% 50%);
+  --color-interactive-03: hsl(190 100% 45%);
+  --color-interactive-04: hsl(190 100% 45%);
 
-  --color-action: hsl(190 90% 45%);
-  --color-action-foreground: hsl(0 0% 100%);
+  /* UI surfaces */
+  --color-ui-background: hsl(225 35% 10%);
+  --color-ui-01: hsl(225 30% 14%);
+  --color-ui-02: hsl(225 25% 17%);
+  --color-ui-03: hsl(225 20% 21%);
+  --color-ui-04: hsl(225 15% 28%);
+  --color-ui-05: hsl(225 10% 38%);
 
-  --color-focus: hsl(180 90% 50%);
+  /* Text */
+  --color-text-01: hsl(220 15% 94%);
+  --color-text-02: hsl(220 10% 70%);
+  --color-text-03: hsl(220 8% 50%);
+  --color-text-04: hsl(220 15% 94%);
+  --color-text-on-color: hsl(0 0% 100%);
 
-  --color-status-success: hsl(142 60% 40%);
-  --color-status-warning: hsl(38 90% 50%);
-  --color-status-error: hsl(0 75% 55%);
-  --color-status-info: hsl(210 80% 55%);
+  /* Support / Status */
+  --color-support-success: hsl(145 65% 42%);
+  --color-support-warning: hsl(38 95% 52%);
+  --color-support-error: hsl(0 80% 58%);
+  --color-support-info: hsl(210 85% 55%);
 
-  --color-surface: hsl(225 30% 12%);
-  --color-surface-elevated: hsl(225 25% 18%);
-  --color-surface-panel: hsl(225 22% 22%);
+  /* Focus */
+  --color-focus: hsl(190 100% 50%);
+  --color-focus-inset: hsl(190 100% 50%);
 
-  --color-content: hsl(220 15% 92%);
-  --color-content-muted: hsl(220 10% 65%);
-  --color-content-inverse: hsl(225 30% 12%);
+  /* Hover / Active */
+  --color-hover-primary: hsl(211 100% 45%);
+  --color-hover-ui: hsl(225 25% 24%);
+  --color-active-ui: hsl(225 25% 28%);
+  --color-hover-row: hsl(225 25% 20%);
+  --color-selected-ui: hsl(211 100% 50% / 0.12);
+  --color-hover-selected-ui: hsl(211 100% 50% / 0.18);
 
-  --color-border: hsl(225 15% 28%);
-  --color-border-interactive: hsl(190 60% 45%);
+  /* Borders */
+  --color-border-subtle: hsl(225 15% 25%);
+  --color-border-strong: hsl(225 15% 35%);
+  --color-border-interactive: hsl(211 100% 50%);
 
-  --radius-card: 0.5rem;
-  --font-display: 'Inter', sans-serif;
+  /* DOS brand accent */
+  --color-dos-brand: hsl(211 100% 50%);
+  --color-dos-cyan: hsl(190 100% 45%);
+  --color-dos-violet: hsl(260 60% 60%);
+
+  /* Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Spacing (Carbon scale) */
+  --spacing-01: 0.125rem;
+  --spacing-02: 0.25rem;
+  --spacing-03: 0.5rem;
+  --spacing-04: 0.75rem;
+  --spacing-05: 1rem;
+  --spacing-06: 1.5rem;
+  --spacing-07: 2rem;
+  --spacing-08: 2.5rem;
+  --spacing-09: 3rem;
+  --spacing-10: 4rem;
+  --spacing-11: 5rem;
+  --spacing-12: 6rem;
+
+  /* Radius */
+  --radius-sm: 0.125rem;
+  --radius-md: 0.25rem;
+  --radius-lg: 0.5rem;
 }
 
 :root {
-  --brand: 225 80% 55%;
-  --brand-foreground: 0 0% 100%;
+  /* Dark theme (default per DOS brand direction) */
+  --interactive-01: 211 100% 50%;
+  --interactive-02: 211 100% 50%;
+  --interactive-03: 190 100% 45%;
+  --interactive-04: 190 100% 45%;
 
-  --action: 190 90% 45%;
-  --action-foreground: 0 0% 100%;
+  --ui-background: 225 35% 10%;
+  --ui-01: 225 30% 14%;
+  --ui-02: 225 25% 17%;
+  --ui-03: 225 20% 21%;
+  --ui-04: 225 15% 28%;
+  --ui-05: 225 10% 38%;
 
-  --focus: 180 90% 50%;
+  --text-01: 220 15% 94%;
+  --text-02: 220 10% 70%;
+  --text-03: 220 8% 50%;
+  --text-on-color: 0 0% 100%;
 
-  --status-success: 142 60% 40%;
-  --status-warning: 38 90% 50%;
-  --status-error: 0 75% 55%;
-  --status-info: 210 80% 55%;
+  --support-success: 145 65% 42%;
+  --support-warning: 38 95% 52%;
+  --support-error: 0 80% 58%;
+  --support-info: 210 85% 55%;
 
-  --surface: 225 30% 12%;
-  --surface-elevated: 225 25% 18%;
-  --surface-panel: 225 22% 22%;
+  --focus: 190 100% 50%;
+  --hover-primary: 211 100% 45%;
+  --hover-ui: 225 25% 24%;
+  --active-ui: 225 25% 28%;
+  --hover-row: 225 25% 20%;
+  --selected-ui: 211 100% 50%;
+  --hover-selected-ui: 211 100% 50%;
 
-  --content: 220 15% 92%;
-  --content-muted: 220 10% 65%;
-  --content-inverse: 225 30% 12%;
+  --border-subtle: 225 15% 25%;
+  --border-strong: 225 15% 35%;
+  --border-interactive: 211 100% 50%;
 
-  --border: 225 15% 28%;
-  --border-interactive: 190 60% 45%;
-
-  --radius: 0.5rem;
+  --dos-brand: 211 100% 50%;
+  --dos-cyan: 190 100% 45%;
+  --dos-violet: 260 60% 60%;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    --surface: 0 0% 100%;
-    --surface-elevated: 220 20% 96%;
-    --surface-panel: 220 15% 90%;
-    --content: 225 30% 12%;
-    --content-muted: 225 10% 45%;
-    --content-inverse: 0 0% 100%;
-    --border: 225 15% 85%;
-  }
+[data-theme="light"] {
+  --interactive-01: 211 100% 42%;
+  --interactive-02: 211 100% 42%;
+  --interactive-03: 190 90% 38%;
+  --interactive-04: 190 90% 38%;
+
+  --ui-background: 0 0% 100%;
+  --ui-01: 0 0% 100%;
+  --ui-02: 210 20% 98%;
+  --ui-03: 210 16% 95%;
+  --ui-04: 210 12% 88%;
+  --ui-05: 210 10% 75%;
+
+  --text-01: 225 30% 12%;
+  --text-02: 225 15% 35%;
+  --text-03: 225 10% 55%;
+  --text-on-color: 0 0% 100%;
+
+  --support-success: 145 60% 36%;
+  --support-warning: 38 90% 45%;
+  --support-error: 0 72% 50%;
+  --support-info: 210 80% 48%;
+
+  --focus: 190 90% 42%;
+  --hover-primary: 211 100% 38%;
+  --hover-ui: 210 16% 93%;
+  --active-ui: 210 16% 90%;
+  --hover-row: 210 16% 95%;
+  --selected-ui: 211 100% 42%;
+  --hover-selected-ui: 211 100% 42%;
+
+  --border-subtle: 210 14% 90%;
+  --border-strong: 210 14% 80%;
+  --border-interactive: 211 100% 42%;
+
+  --dos-brand: 211 100% 42%;
+  --dos-cyan: 190 90% 38%;
+  --dos-violet: 260 50% 50%;
 }
 
 body {
   margin: 0;
-  background: hsl(var(--surface));
-  color: hsl(var(--content));
-  font-family: var(--font-display);
+  background: hsl(var(--ui-background));
+  color: hsl(var(--text-01));
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: hsl(var(--interactive-04));
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: hsl(var(--ui-01));
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--ui-04));
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--ui-05));
 }

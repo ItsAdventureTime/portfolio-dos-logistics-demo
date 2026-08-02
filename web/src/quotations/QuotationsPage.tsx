@@ -21,7 +21,7 @@ const columns: ColumnDef<Quotation, unknown>[] = [
     header: 'Number',
     accessorKey: 'quotation_number',
     cell: ({ row }) => (
-      <span className="font-medium text-[hsl(var(--content))]">{row.original.quotation_number}</span>
+      <span className="font-medium text-[hsl(var(--text-01))]">{row.original.quotation_number}</span>
     ),
   },
   {
@@ -35,13 +35,13 @@ const columns: ColumnDef<Quotation, unknown>[] = [
   {
     header: 'Currency',
     accessorKey: 'currency_code',
-    cell: ({ row }) => <span className="text-[hsl(var(--content-muted))]">{row.original.currency_code}</span>,
+    cell: ({ row }) => <span className="text-[hsl(var(--text-03))]">{row.original.currency_code}</span>,
   },
   {
     header: 'Total',
     accessorKey: 'total',
     cell: ({ row }) => (
-      <span className="font-medium text-[hsl(var(--content))]">
+      <span className="text-right font-medium text-[hsl(var(--text-01))]">
         {formatCurrency(row.original.total, row.original.currency_code)}
       </span>
     ),
@@ -49,7 +49,7 @@ const columns: ColumnDef<Quotation, unknown>[] = [
   {
     header: 'Version',
     accessorKey: 'version',
-    cell: ({ row }) => <span className="text-[hsl(var(--content-muted))]">v{row.original.version}</span>,
+    cell: ({ row }) => <span className="text-[hsl(var(--text-03))]">v{row.original.version}</span>,
   },
 ]
 
@@ -84,10 +84,10 @@ const mockQuotations: Quotation[] = [
 
 export function QuotationsPage() {
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5">
       <div>
-        <h1 className="text-xl font-semibold text-[hsl(var(--content))]">Quotations</h1>
-        <p className="mt-1 text-sm text-[hsl(var(--content-muted))]">Create, review, and manage freight quotations</p>
+        <h1 className="text-lg font-semibold text-[hsl(var(--text-01))]">Quotations</h1>
+        <p className="mt-0.5 text-sm text-[hsl(var(--text-03))]">Create, review, and manage freight quotations</p>
       </div>
 
       {/* Desktop: TanStack Table */}
@@ -97,13 +97,15 @@ export function QuotationsPage() {
           data={mockQuotations}
           caption="Freight quotations"
           emptyMessage="No quotations found. Create one to get started."
+          zebra={true}
+          density="normal"
         />
       </div>
 
       {/* Mobile: card-based alternative */}
       <div className="flex flex-col gap-3 sm:hidden">
         {mockQuotations.length === 0 ? (
-          <p className="rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--surface-elevated))] p-6 text-center text-sm text-[hsl(var(--content-muted))]">
+          <p className="rounded-[var(--radius-sm)] border border-[hsl(var(--border-subtle))] bg-[hsl(var(--ui-01))] p-6 text-center text-sm text-[hsl(var(--text-03))]">
             No quotations found. Create one to get started.
           </p>
         ) : (
@@ -112,16 +114,16 @@ export function QuotationsPage() {
             return (
               <div
                 key={q.id}
-                className="rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--surface-elevated))] p-4"
+                className="rounded-[var(--radius-sm)] border border-[hsl(var(--border-subtle))] bg-[hsl(var(--ui-01))] p-4"
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-medium text-[hsl(var(--content))]">{q.quotation_number}</span>
+                  <span className="font-medium text-[hsl(var(--text-01))]">{q.quotation_number}</span>
                   <Badge status={config.status}>{config.label}</Badge>
                 </div>
-                <p className="mt-2 text-sm text-[hsl(var(--content-muted))]">{q.notes}</p>
+                <p className="mt-2 text-sm text-[hsl(var(--text-03))]">{q.notes}</p>
                 <div className="mt-3 flex items-center justify-between text-sm">
-                  <span className="text-[hsl(var(--content))]">{formatCurrency(q.total, q.currency_code)}</span>
-                  <span className="text-[hsl(var(--content-muted))]">v{q.version}</span>
+                  <span className="text-[hsl(var(--text-01))]">{formatCurrency(q.total, q.currency_code)}</span>
+                  <span className="text-[hsl(var(--text-03))]">v{q.version}</span>
                 </div>
               </div>
             )
