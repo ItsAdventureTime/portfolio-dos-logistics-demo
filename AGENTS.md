@@ -53,13 +53,20 @@ These decisions are recorded in `DECISIONS.md`:
 
 ## Status
 
-Stages 1 through 5 are complete:
+All 8 stages complete:
 
 - Stage 1: contract confirmed, decision log seeded, spec copied read-only
-- Stage 2: foundation: runtimes, linting, testing, health endpoint, CI
-- Stage 3: identity and authorization: users, sessions, OTP, CSRF, audit
-- Stage 4: workflow slices: quotation through collection
+- Stage 2: foundation (runtimes, linting, testing, health endpoint, CI)
+- Stage 3: identity and authorization (users, sessions, OTP, CSRF, audit)
+- Stage 4: workflow slices (quotation through collection)
 - Stage 5: documents and demonstration data
+- Stage 6: responsive enterprise UX (React Aria, TanStack Table, dashboard)
+- Stage 7: deployment (rootless Podman Quadlets, Caddy, pasta networking)
+- Stage 8: review and handoff (acceptance matrix, final report)
+
+See [`docs/final-report.md`](docs/final-report.md) for the handoff report
+and [`docs/acceptance-results.md`](docs/acceptance-results.md) for the
+acceptance matrix results.
 
 ## Final report
 

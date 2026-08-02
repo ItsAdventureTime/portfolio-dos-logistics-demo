@@ -8,5 +8,14 @@ for architecture decisions.
 
 ## Status
 
-Stages 1 through 5 complete. Identity, workflow, and document handling are
-implemented with 61 passing tests.
+All 8 stages complete. 78 tests pass. Demo mode available.
+
+```sh
+./scripts/run-demo
+```
+
+Open `http://127.0.0.1:5173` and sign in with `admin` / `Password123!`.
+
+See [`docs/final-report.md`](docs/final-report.md) for the full handoff report
+and [`docs/acceptance-results.md`](docs/acceptance-results.md) for the
+acceptance matrix results.
