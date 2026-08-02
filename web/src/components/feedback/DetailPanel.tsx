@@ -31,6 +31,8 @@ function formatCurrency(cents: number, code = 'USD'): string {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: code }).format(cents / 100)
 }
 
+import { DocumentList } from './DocViewer'
+
 export function DetailPanel({ title, subtitle, lines, timeline, documents, metadata }: DetailPanelProps) {
   return (
     <div className="flex flex-col gap-5">
@@ -83,28 +85,11 @@ export function DetailPanel({ title, subtitle, lines, timeline, documents, metad
         </div>
       )}
 
-      {/* Documents */}
+      {/* Documents - interactive with modal viewer */}
       {documents && documents.length > 0 && (
         <div>
           <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-[hsl(var(--text-03))]">Documents</h4>
-          <ul className="flex flex-col gap-2">
-            {documents.map((doc, i) => (
-              <li key={i} className="flex items-center justify-between rounded-[var(--radius-sm)] border border-[hsl(var(--border-subtle))] bg-[hsl(var(--ui-02))]/50 px-3 py-2">
-                <div className="flex items-center gap-2.5">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-[var(--radius-sm)] bg-[hsl(var(--interactive-01))]/10 text-xs text-[hsl(var(--interactive-04))]" aria-hidden="true">
-                    {doc.type === 'PDF' ? 'PDF' : doc.type === 'IMG' ? 'IMG' : 'DOC'}
-                  </span>
-                  <div>
-                    <p className="text-sm text-[hsl(var(--text-01))]">{doc.name}</p>
-                    <p className="text-[11px] text-[hsl(var(--text-03))]">{doc.type} - {doc.size}</p>
-                  </div>
-                </div>
-                <button className="text-xs text-[hsl(var(--interactive-04))] hover:underline" aria-label={`Download ${doc.name}`}>
-                  View
-                </button>
-              </li>
-            ))}
-          </ul>
+          <DocumentList documents={documents} />
         </div>
       )}
 
