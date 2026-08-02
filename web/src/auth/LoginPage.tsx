@@ -91,14 +91,18 @@ export function LoginPage({ onSuccess }: { onSuccess: () => void }) {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[hsl(var(--ui-background))] px-4">
-      <div className="w-full max-w-sm">
+      {/* Background gradient accent */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
+        <div className="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-[hsl(var(--interactive-01))]/8 blur-3xl" />
+        <div className="absolute -bottom-40 -right-40 h-96 w-96 rounded-full bg-[hsl(var(--dos-violet))]/8 blur-3xl" />
+      </div>
+
+      <div className="relative w-full max-w-sm" style={{ animation: 'var(--duration-slow-01) var(--ease-entrance) fadeIn' }}>
         {/* DOS brand lockup */}
         <div className="mb-8 flex flex-col items-center gap-4">
-          <img
-            src="/dos-mark.png"
-            alt="DOS"
-            className="h-12 w-12 rounded-[var(--radius-sm)]"
-          />
+          <div className="flex h-14 w-14 items-center justify-center rounded-[var(--radius-md)] bg-[hsl(var(--ui-01))] shadow-[var(--shadow-03)]">
+            <img src="/dos-mark.png" alt="DOS" className="h-10 w-10 rounded-[var(--radius-sm)]" />
+          </div>
           <div className="text-center">
             <h1 className="text-lg font-semibold text-[hsl(var(--text-01))]">DOS FreightFlow Control</h1>
             <p className="mt-0.5 text-sm text-[hsl(var(--text-03))]">DelegateOps Business Support Services</p>
@@ -106,7 +110,7 @@ export function LoginPage({ onSuccess }: { onSuccess: () => void }) {
         </div>
 
         {mode === 'login' ? (
-          <div className="rounded-[var(--radius-sm)] border border-[hsl(var(--border-subtle))] bg-[hsl(var(--ui-01))] p-6">
+          <div className="rounded-[var(--radius-md)] border border-[hsl(var(--border-subtle))] bg-[hsl(var(--ui-01))] p-6 shadow-[var(--shadow-03)]">
             <p className="mb-5 text-sm text-[hsl(var(--text-02))]">Sign in to your workspace</p>
             <form onSubmit={loginForm.handleSubmit(handleLogin)} className="flex flex-col gap-4" noValidate>
               <FieldInput
@@ -137,7 +141,7 @@ export function LoginPage({ onSuccess }: { onSuccess: () => void }) {
             </form>
           </div>
         ) : (
-          <div className="rounded-[var(--radius-sm)] border border-[hsl(var(--border-subtle))] bg-[hsl(var(--ui-01))] p-6">
+          <div className="rounded-[var(--radius-md)] border border-[hsl(var(--border-subtle))] bg-[hsl(var(--ui-01))] p-6 shadow-[var(--shadow-03)]">
             <h2 className="mb-1.5 text-sm font-semibold text-[hsl(var(--text-01))]">Verify your email</h2>
             <p className="mb-5 text-sm text-[hsl(var(--text-03))]">
               A verification code was sent to the email on file{displayName ? `, ${displayName}` : ''}. Enter it below.
@@ -171,6 +175,13 @@ export function LoginPage({ onSuccess }: { onSuccess: () => void }) {
           </div>
         )}
       </div>
+
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   )
 }

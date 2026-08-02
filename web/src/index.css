@@ -9,6 +9,7 @@
  *
  * Spacing follows the Carbon scale: 2, 4, 8, 12, 16, 24, 32, 48, 64px.
  * Typography uses Inter (open-source, geometric, close to IBM Plex Sans).
+ * Motion follows Carbon duration tokens and easing curves.
  * Status colors always pair with text or icons. Never color alone.
  */
 
@@ -84,6 +85,25 @@
   --radius-sm: 0.125rem;
   --radius-md: 0.25rem;
   --radius-lg: 0.5rem;
+
+  /* Motion (Carbon duration tokens) */
+  --duration-fast-01: 70ms;
+  --duration-fast-02: 110ms;
+  --duration-moderate-01: 150ms;
+  --duration-moderate-02: 240ms;
+  --duration-slow-01: 400ms;
+
+  /* Easing (Carbon curves) */
+  --ease-productive: cubic-bezier(0.2, 0, 0.38, 0.9);
+  --ease-expressive: cubic-bezier(0.4, 0.14, 0.3, 1);
+  --ease-entrance: cubic-bezier(0, 0, 0.38, 0.9);
+  --ease-exit: cubic-bezier(0.2, 0, 1, 0.9);
+
+  /* Elevation (layer shadows) */
+  --shadow-01: 0 1px 2px 0 hsl(225 50% 5% / 0.3);
+  --shadow-02: 0 2px 4px 0 hsl(225 50% 5% / 0.4);
+  --shadow-03: 0 4px 12px 0 hsl(225 50% 5% / 0.5);
+  --shadow-04: 0 8px 32px 0 hsl(225 50% 5% / 0.6);
 }
 
 :root {
@@ -185,6 +205,7 @@ body {
 a {
   color: hsl(var(--interactive-04));
   text-decoration: none;
+  transition: color var(--duration-fast-01) var(--ease-productive);
 }
 
 a:hover {
@@ -202,7 +223,19 @@ a:hover {
 ::-webkit-scrollbar-thumb {
   background: hsl(var(--ui-04));
   border-radius: 4px;
+  transition: background var(--duration-fast-01) var(--ease-productive);
 }
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--ui-05));
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

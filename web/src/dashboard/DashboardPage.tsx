@@ -16,7 +16,7 @@ export function DashboardPage() {
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="h-28 animate-pulse rounded-[var(--radius-sm)] border border-[hsl(var(--border-subtle))] bg-[hsl(var(--ui-02))]" />
+            <div key={i} className="h-28 animate-pulse rounded-[var(--radius-md)] border border-[hsl(var(--border-subtle))] bg-[hsl(var(--ui-02))]" />
           ))}
         </div>
       </div>
@@ -26,10 +26,8 @@ export function DashboardPage() {
   if (isError || !data) {
     return (
       <div className="flex flex-col gap-6">
-        <div>
-          <h1 className="text-lg font-semibold text-[hsl(var(--text-01))]">Dashboard</h1>
-        </div>
-        <div className="rounded-[var(--radius-sm)] border border-[hsl(var(--support-error))]/30 bg-[hsl(var(--support-error))]/10 p-4 text-sm text-[hsl(var(--support-error))]">
+        <div><h1 className="text-lg font-semibold text-[hsl(var(--text-01))]">Dashboard</h1></div>
+        <div className="rounded-[var(--radius-md)] border border-[hsl(var(--support-error))]/30 bg-[hsl(var(--support-error))]/10 p-4 text-sm text-[hsl(var(--support-error))]">
           Unable to load dashboard data. Please try again.
         </div>
       </div>
@@ -53,15 +51,15 @@ export function DashboardPage() {
           {kpis.map((kpi, i) => (
             <div
               key={i}
-              className="rounded-[var(--radius-sm)] border border-[hsl(var(--border-subtle))] bg-[hsl(var(--ui-01))] p-4"
+              className="rounded-[var(--radius-md)] border border-[hsl(var(--border-subtle))] bg-[hsl(var(--ui-01))] p-5 shadow-[var(--shadow-01)] transition-all var(--duration-moderate-01) var(--ease-productive) hover:border-[hsl(var(--border-interactive))] hover:shadow-[var(--shadow-02)]"
             >
-              <p className="text-xs font-medium uppercase tracking-wide text-[hsl(var(--text-03))]">{kpi.label}</p>
-              <p className="mt-2 text-2xl font-semibold text-[hsl(var(--text-01))]">{kpi.value}</p>
+              <p className="text-xs font-medium uppercase tracking-wider text-[hsl(var(--text-03))]">{kpi.label}</p>
+              <p className="mt-3 text-2xl font-semibold text-[hsl(var(--text-01))]">{kpi.value}</p>
               {kpi.trend && (
                 <p
-                  className={`mt-1.5 flex items-center gap-1 text-xs ${kpi.trend_direction === 'up' ? 'text-[hsl(var(--support-success))]' : kpi.trend_direction === 'down' ? 'text-[hsl(var(--support-error))]' : 'text-[hsl(var(--text-03))]'}`}
+                  className={`mt-2 flex items-center gap-1 text-xs ${kpi.trend_direction === 'up' ? 'text-[hsl(var(--support-success))]' : kpi.trend_direction === 'down' ? 'text-[hsl(var(--support-error))]' : 'text-[hsl(var(--text-03))]'}`}
                 >
-                  <span aria-hidden="true">
+                  <span aria-hidden="true" className="text-sm">
                     {kpi.trend_direction === 'up' ? '\u2191' : kpi.trend_direction === 'down' ? '\u2193' : '\u2014'}
                   </span>
                   {kpi.trend}
@@ -76,20 +74,20 @@ export function DashboardPage() {
       {activity.length > 0 && (
         <section
           aria-labelledby="activity-heading"
-          className="rounded-[var(--radius-sm)] border border-[hsl(var(--border-subtle))] bg-[hsl(var(--ui-01))]"
+          className="rounded-[var(--radius-md)] border border-[hsl(var(--border-subtle))] bg-[hsl(var(--ui-01))] shadow-[var(--shadow-01)]"
         >
-          <div className="border-b border-[hsl(var(--border-subtle))] px-4 py-3">
+          <div className="border-b border-[hsl(var(--border-subtle))] px-5 py-3">
             <h2 id="activity-heading" className="text-sm font-semibold text-[hsl(var(--text-01))]">Recent activity</h2>
           </div>
           <ul className="flex flex-col">
             {activity.map((item, i) => (
               <li
                 key={i}
-                className={`flex items-center justify-between px-4 py-3 ${i < activity.length - 1 ? 'border-b border-[hsl(var(--border-subtle))]/60' : ''}`}
+                className={`flex items-center justify-between px-5 py-3.5 transition-colors var(--duration-fast-01) var(--ease-productive) hover:bg-[hsl(var(--hover-row))] ${i < activity.length - 1 ? 'border-b border-[hsl(var(--border-subtle))]/60' : ''}`}
               >
                 <div className="flex flex-col gap-0.5">
                   <p className="text-sm text-[hsl(var(--text-01))]">{item.action}</p>
-                  <p className="text-xs text-[hsl(var(--text-03))]">{item.entity} \u00B7 {item.actor}</p>
+                  <p className="text-xs text-[hsl(var(--text-03))]">{item.entity} - {item.actor}</p>
                 </div>
                 <span className="text-xs whitespace-nowrap text-[hsl(var(--text-03))]">{item.timestamp}</span>
               </li>
@@ -99,9 +97,15 @@ export function DashboardPage() {
       )}
 
       {/* Summary stats */}
-      <div className="flex gap-4 text-sm text-[hsl(var(--text-03))]">
-        <span>{data.client_count} clients</span>
-        <span>{data.quotation_count} quotations</span>
+      <div className="flex gap-6 rounded-[var(--radius-md)] border border-[hsl(var(--border-subtle))] bg-[hsl(var(--ui-01))] p-4 shadow-[var(--shadow-01)]">
+        <div className="flex flex-col">
+          <span className="text-2xl font-semibold text-[hsl(var(--interactive-04))]">{data.client_count}</span>
+          <span className="text-xs text-[hsl(var(--text-03))]">Clients</span>
+        </div>
+        <div className="flex flex-col">
+          <span className="text-2xl font-semibold text-[hsl(var(--interactive-04))]">{data.quotation_count}</span>
+          <span className="text-xs text-[hsl(var(--text-03))]">Quotations</span>
+        </div>
       </div>
     </div>
   )
