@@ -12,16 +12,16 @@ type QuotationID string
 
 // Client is the company whose freight is managed.
 type Client struct {
-	ID           ClientID
-	Name         string
-	Code         string
-	ContactEmail string
-	ContactPhone string
-	Address      string
-	IsActive     bool
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
-	Version      int
+	ID           ClientID    `json:"id"`
+	Name         string      `json:"name"`
+	Code         string      `json:"code"`
+	ContactEmail string      `json:"contact_email"`
+	ContactPhone string      `json:"contact_phone"`
+	Address      string      `json:"address"`
+	IsActive     bool        `json:"is_active"`
+	CreatedAt    time.Time   `json:"created_at"`
+	UpdatedAt    time.Time   `json:"updated_at"`
+	Version      int         `json:"version"`
 }
 
 // QuotationStatus represents the state of a quotation in its lifecycle.
@@ -38,40 +38,40 @@ const (
 
 // Quotation is a freight quotation with state machine lifecycle.
 type Quotation struct {
-	ID             QuotationID
-	ClientID       ClientID
-	QuotationNumber string
-	Status         QuotationStatus
-	CurrencyCode   string
-	Subtotal       int64 // stored as cents to avoid float issues
-	TaxAmount      int64
-	Total          int64
-	Notes          string
-	CreatedBy      *UserID
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-	AcceptedAt     *time.Time
-	VoidedAt       *time.Time
-	Version        int
-	Lines          []QuotationLine
+	ID              QuotationID      `json:"id"`
+	ClientID        ClientID         `json:"client_id"`
+	QuotationNumber string           `json:"quotation_number"`
+	Status          QuotationStatus  `json:"status"`
+	CurrencyCode    string           `json:"currency_code"`
+	Subtotal        int64            `json:"subtotal"`
+	TaxAmount       int64            `json:"tax_amount"`
+	Total           int64            `json:"total"`
+	Notes           string           `json:"notes"`
+	CreatedBy       *UserID          `json:"created_by,omitempty"`
+	CreatedAt       time.Time        `json:"created_at"`
+	UpdatedAt       time.Time        `json:"updated_at"`
+	AcceptedAt      *time.Time       `json:"accepted_at,omitempty"`
+	VoidedAt        *time.Time       `json:"voided_at,omitempty"`
+	Version         int              `json:"version"`
+	Lines           []QuotationLine  `json:"lines"`
 }
 
 // QuotationLine is an individual charge on a quotation.
 type QuotationLine struct {
-	ID          string
-	QuotationID QuotationID
-	Description  string
-	Quantity     int64 // stored as fixed-point (e.g., 100 = 1.00)
-	UnitPrice    int64 // stored as cents
-	LineTotal    int64 // stored as cents
-	SortOrder    int
-	CreatedAt    time.Time
+	ID          string    `json:"id"`
+	QuotationID QuotationID `json:"quotation_id"`
+	Description string    `json:"description"`
+	Quantity    int64     `json:"quantity"`
+	UnitPrice   int64     `json:"unit_price"`
+	LineTotal   int64     `json:"line_total"`
+	SortOrder   int       `json:"sort_order"`
+	CreatedAt   time.Time `json:"created_at"`
 }
 
 // QuotationTransition represents a valid state transition.
 type QuotationTransition struct {
-	From QuotationStatus
-	To   QuotationStatus
+	From QuotationStatus `json:"from"`
+	To   QuotationStatus `json:"to"`
 }
 
 // ValidQuotationTransitions defines the legal state transitions per

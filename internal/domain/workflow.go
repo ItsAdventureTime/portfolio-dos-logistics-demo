@@ -7,33 +7,33 @@ import "time"
 type FundingSourceID string
 
 type FundingSource struct {
-	ID           FundingSourceID
-	Name         string
-	Code         string
-	IsApproved   bool
-	BalanceCents int64
-	CurrencyCode string
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
-	Version      int
+	ID           FundingSourceID `json:"id"`
+	Name         string          `json:"name"`
+	Code         string          `json:"code"`
+	IsApproved   bool            `json:"is_approved"`
+	BalanceCents int64           `json:"balance_cents"`
+	CurrencyCode string          `json:"currency_code"`
+	CreatedAt    time.Time       `json:"created_at"`
+	UpdatedAt    time.Time       `json:"updated_at"`
+	Version      int             `json:"version"`
 }
 
-// --- Budget Request (Shipment Funding Request) ---
+// --- Budget Request ---
 
 type BudgetRequestID string
 
 type BudgetRequestStatus string
 
 const (
-	BudgetRequestStatusDraft         BudgetRequestStatus = "draft"
-	BudgetRequestStatusControlsReview BudgetRequestStatus = "controls_review"
-	BudgetRequestStatusApproved      BudgetRequestStatus = "approved"
-	BudgetRequestStatusRejected      BudgetRequestStatus = "rejected"
-	BudgetRequestStatusReturned      BudgetRequestStatus = "returned"
+	BudgetRequestStatusDraft          BudgetRequestStatus = "draft"
+	BudgetRequestStatusControlsReview  BudgetRequestStatus = "controls_review"
+	BudgetRequestStatusApproved       BudgetRequestStatus = "approved"
+	BudgetRequestStatusRejected       BudgetRequestStatus = "rejected"
+	BudgetRequestStatusReturned       BudgetRequestStatus = "returned"
 )
 
 var ValidBudgetRequestTransitions = map[BudgetRequestStatus][]BudgetRequestStatus{
-	BudgetRequestStatusDraft:          {BudgetRequestStatusControlsReview},
+	BudgetRequestStatusDraft:           {BudgetRequestStatusControlsReview},
 	BudgetRequestStatusControlsReview:  {BudgetRequestStatusApproved, BudgetRequestStatusRejected, BudgetRequestStatusReturned},
 	BudgetRequestStatusApproved:        {}, // terminal
 	BudgetRequestStatusRejected:        {}, // terminal
@@ -42,47 +42,41 @@ var ValidBudgetRequestTransitions = map[BudgetRequestStatus][]BudgetRequestStatu
 
 func CanTransitionBudgetRequest(from, to BudgetRequestStatus) bool {
 	allowed, ok := ValidBudgetRequestTransitions[from]
-	if !ok {
-		return false
-	}
-	for _, t := range allowed {
-		if t == to {
-			return true
-		}
-	}
+	if !ok { return false }
+	for _, t := range allowed { if t == to { return true } }
 	return false
 }
 
 type BudgetRequest struct {
-	ID            BudgetRequestID
-	QuotationID   QuotationID
-	ClientID      ClientID
-	RequestNumber string
-	Status        BudgetRequestStatus
-	CurrencyCode  string
-	AmountCents   int64
-	Purpose       string
-	Notes         string
-	CreatedBy     *UserID
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
-	ApprovedAt    *time.Time
-	RejectedAt    *time.Time
-	ReturnedAt    *time.Time
-	Version       int
-	Lines         []BudgetLine
+	ID            BudgetRequestID      `json:"id"`
+	QuotationID   QuotationID          `json:"quotation_id"`
+	ClientID      ClientID             `json:"client_id"`
+	RequestNumber string               `json:"request_number"`
+	Status        BudgetRequestStatus  `json:"status"`
+	CurrencyCode  string               `json:"currency_code"`
+	AmountCents   int64                `json:"amount_cents"`
+	Purpose       string               `json:"purpose"`
+	Notes         string               `json:"notes"`
+	CreatedBy     *UserID              `json:"created_by,omitempty"`
+	CreatedAt     time.Time            `json:"created_at"`
+	UpdatedAt     time.Time            `json:"updated_at"`
+	ApprovedAt    *time.Time           `json:"approved_at,omitempty"`
+	RejectedAt    *time.Time           `json:"rejected_at,omitempty"`
+	ReturnedAt    *time.Time           `json:"returned_at,omitempty"`
+	Version       int                  `json:"version"`
+	Lines         []BudgetLine         `json:"lines"`
 }
 
 type BudgetLine struct {
-	ID              string
-	BudgetRequestID BudgetRequestID
-	Description     string
-	AmountCents     int64
-	SortOrder       int
-	CreatedAt       time.Time
+	ID              string             `json:"id"`
+	BudgetRequestID BudgetRequestID    `json:"budget_request_id"`
+	Description     string             `json:"description"`
+	AmountCents     int64              `json:"amount_cents"`
+	SortOrder       int                `json:"sort_order"`
+	CreatedAt       time.Time          `json:"created_at"`
 }
 
-// --- Approval Decision (Controls Review) ---
+// --- Approval Decision ---
 
 type ApprovalDecisionType string
 
@@ -93,12 +87,12 @@ const (
 )
 
 type ApprovalDecision struct {
-	ID              string
-	BudgetRequestID BudgetRequestID
-	Decision        ApprovalDecisionType
-	ActorID         UserID
-	Reason          string
-	CreatedAt       time.Time
+	ID              string               `json:"id"`
+	BudgetRequestID BudgetRequestID      `json:"budget_request_id"`
+	Decision        ApprovalDecisionType `json:"decision"`
+	ActorID         UserID               `json:"actor_id"`
+	Reason          string               `json:"reason"`
+	CreatedAt       time.Time            `json:"created_at"`
 }
 
 // --- Disbursement ---
@@ -123,43 +117,37 @@ var ValidDisbursementTransitions = map[DisbursementStatus][]DisbursementStatus{
 
 func CanTransitionDisbursement(from, to DisbursementStatus) bool {
 	allowed, ok := ValidDisbursementTransitions[from]
-	if !ok {
-		return false
-	}
-	for _, t := range allowed {
-		if t == to {
-			return true
-		}
-	}
+	if !ok { return false }
+	for _, t := range allowed { if t == to { return true } }
 	return false
 }
 
 type Disbursement struct {
-	ID              DisbursementID
-	BudgetRequestID  BudgetRequestID
-	FundingSourceID  FundingSourceID
-	Status           DisbursementStatus
-	AmountCents      int64
-	CurrencyCode     string
-	ReferenceNumber  string
-	Notes            string
-	CreatedBy        *UserID
-	CreatedAt        time.Time
-	UpdatedAt        time.Time
-	ReleasedAt       *time.Time
-	HeldAt           *time.Time
-	ReturnedAt       *time.Time
-	Version          int
-	PaymentProofs    []PaymentProof
+	ID              DisbursementID    `json:"id"`
+	BudgetRequestID BudgetRequestID   `json:"budget_request_id"`
+	FundingSourceID FundingSourceID   `json:"funding_source_id"`
+	Status           DisbursementStatus `json:"status"`
+	AmountCents      int64             `json:"amount_cents"`
+	CurrencyCode     string            `json:"currency_code"`
+	ReferenceNumber  string            `json:"reference_number"`
+	Notes            string            `json:"notes"`
+	CreatedBy        *UserID           `json:"created_by,omitempty"`
+	CreatedAt        time.Time         `json:"created_at"`
+	UpdatedAt        time.Time         `json:"updated_at"`
+	ReleasedAt       *time.Time        `json:"released_at,omitempty"`
+	HeldAt           *time.Time        `json:"held_at,omitempty"`
+	ReturnedAt       *time.Time        `json:"returned_at,omitempty"`
+	Version          int               `json:"version"`
+	PaymentProofs    []PaymentProof    `json:"payment_proofs"`
 }
 
 type PaymentProof struct {
-	ID             string
-	DisbursementID DisbursementID
-	DocumentName   string
-	StorageKey     string
-	UploadedBy     *UserID
-	CreatedAt      time.Time
+	ID             string         `json:"id"`
+	DisbursementID DisbursementID `json:"disbursement_id"`
+	DocumentName   string         `json:"document_name"`
+	StorageKey     string         `json:"storage_key"`
+	UploadedBy     *UserID        `json:"uploaded_by,omitempty"`
+	CreatedAt      time.Time      `json:"created_at"`
 }
 
 // --- Liquidation ---
@@ -182,40 +170,34 @@ var ValidLiquidationTransitions = map[LiquidationStatus][]LiquidationStatus{
 
 func CanTransitionLiquidation(from, to LiquidationStatus) bool {
 	allowed, ok := ValidLiquidationTransitions[from]
-	if !ok {
-		return false
-	}
-	for _, t := range allowed {
-		if t == to {
-			return true
-		}
-	}
+	if !ok { return false }
+	for _, t := range allowed { if t == to { return true } }
 	return false
 }
 
 type Liquidation struct {
-	ID             LiquidationID
-	DisbursementID DisbursementID
-	Status         LiquidationStatus
-	ReleasedAmount int64
-	ActualAmount   int64
-	VarianceAmount int64
-	Notes          string
-	CreatedBy      *UserID
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-	ClosedAt       *time.Time
-	Version        int
-	Evidence       []LiquidationEvidence
+	ID             LiquidationID        `json:"id"`
+	DisbursementID DisbursementID       `json:"disbursement_id"`
+	Status         LiquidationStatus    `json:"status"`
+	ReleasedAmount int64                `json:"released_amount"`
+	ActualAmount   int64                `json:"actual_amount"`
+	VarianceAmount int64                `json:"variance_amount"`
+	Notes          string               `json:"notes"`
+	CreatedBy      *UserID              `json:"created_by,omitempty"`
+	CreatedAt      time.Time            `json:"created_at"`
+	UpdatedAt      time.Time            `json:"updated_at"`
+	ClosedAt       *time.Time           `json:"closed_at,omitempty"`
+	Version        int                  `json:"version"`
+	Evidence       []LiquidationEvidence `json:"evidence"`
 }
 
 type LiquidationEvidence struct {
-	ID            string
-	LiquidationID LiquidationID
-	DocumentName  string
-	StorageKey    string
-	UploadedBy    *UserID
-	CreatedAt     time.Time
+	ID            string        `json:"id"`
+	LiquidationID LiquidationID `json:"liquidation_id"`
+	DocumentName  string        `json:"document_name"`
+	StorageKey    string        `json:"storage_key"`
+	UploadedBy    *UserID       `json:"uploaded_by,omitempty"`
+	CreatedAt     time.Time     `json:"created_at"`
 }
 
 // --- Billing ---
@@ -244,14 +226,8 @@ var ValidBillingTransitions = map[BillingStatus][]BillingStatus{
 
 func CanTransitionBilling(from, to BillingStatus) bool {
 	allowed, ok := ValidBillingTransitions[from]
-	if !ok {
-		return false
-	}
-	for _, t := range allowed {
-		if t == to {
-			return true
-		}
-	}
+	if !ok { return false }
+	for _, t := range allowed { if t == to { return true } }
 	return false
 }
 
@@ -260,36 +236,36 @@ func IsBillingImmutable(s BillingStatus) bool {
 }
 
 type BillingRecord struct {
-	ID             BillingRecordID
-	ClientID       ClientID
-	BudgetRequestID *BudgetRequestID
-	BillingNumber  string
-	Status         BillingStatus
-	CurrencyCode   string
-	Subtotal       int64
-	TaxAmount      int64
-	Total          int64
-	Notes          string
-	CreatedBy      *UserID
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-	ApprovedAt     *time.Time
-	FinalizedAt    *time.Time
-	VoidedAt       *time.Time
-	ReplacedByID   *BillingRecordID
-	Version        int
-	Lines          []BillingLine
+	ID             BillingRecordID    `json:"id"`
+	ClientID       ClientID           `json:"client_id"`
+	BudgetRequestID *BudgetRequestID  `json:"budget_request_id,omitempty"`
+	BillingNumber  string             `json:"billing_number"`
+	Status         BillingStatus      `json:"status"`
+	CurrencyCode   string             `json:"currency_code"`
+	Subtotal       int64              `json:"subtotal"`
+	TaxAmount      int64              `json:"tax_amount"`
+	Total          int64              `json:"total"`
+	Notes          string             `json:"notes"`
+	CreatedBy      *UserID            `json:"created_by,omitempty"`
+	CreatedAt      time.Time          `json:"created_at"`
+	UpdatedAt      time.Time          `json:"updated_at"`
+	ApprovedAt     *time.Time         `json:"approved_at,omitempty"`
+	FinalizedAt    *time.Time         `json:"finalized_at,omitempty"`
+	VoidedAt       *time.Time         `json:"voided_at,omitempty"`
+	ReplacedByID   *BillingRecordID   `json:"replaced_by_id,omitempty"`
+	Version        int                `json:"version"`
+	Lines          []BillingLine      `json:"lines"`
 }
 
 type BillingLine struct {
-	ID              string
-	BillingRecordID BillingRecordID
-	Description     string
-	Quantity        int64
-	UnitPrice       int64
-	LineTotal       int64
-	SortOrder       int
-	CreatedAt       time.Time
+	ID              string          `json:"id"`
+	BillingRecordID BillingRecordID `json:"billing_record_id"`
+	Description     string          `json:"description"`
+	Quantity        int64           `json:"quantity"`
+	UnitPrice       int64           `json:"unit_price"`
+	LineTotal       int64           `json:"line_total"`
+	SortOrder       int             `json:"sort_order"`
+	CreatedAt       time.Time      `json:"created_at"`
 }
 
 // --- Credit Memo ---
@@ -297,16 +273,16 @@ type BillingLine struct {
 type CreditMemoID string
 
 type CreditMemo struct {
-	ID             CreditMemoID
-	ClientID       ClientID
-	BillingRecordID *BillingRecordID
-	MemoNumber     string
-	AmountCents    int64
-	CurrencyCode   string
-	Reason         string
-	CreatedBy      *UserID
-	CreatedAt      time.Time
-	Version        int
+	ID             CreditMemoID      `json:"id"`
+	ClientID       ClientID           `json:"client_id"`
+	BillingRecordID *BillingRecordID `json:"billing_record_id,omitempty"`
+	MemoNumber     string            `json:"memo_number"`
+	AmountCents    int64              `json:"amount_cents"`
+	CurrencyCode   string            `json:"currency_code"`
+	Reason         string            `json:"reason"`
+	CreatedBy      *UserID            `json:"created_by,omitempty"`
+	CreatedAt      time.Time          `json:"created_at"`
+	Version        int                `json:"version"`
 }
 
 // --- Client Payment & Allocation ---
@@ -314,26 +290,26 @@ type CreditMemo struct {
 type ClientPaymentID string
 
 type ClientPayment struct {
-	ID             ClientPaymentID
-	ClientID       ClientID
-	PaymentNumber  string
-	AmountCents    int64
-	CurrencyCode   string
-	PaymentMethod  string
-	ReferenceNumber string
-	ReceivedAt     time.Time
-	CreatedBy      *UserID
-	CreatedAt      time.Time
-	Version        int
+	ID             ClientPaymentID `json:"id"`
+	ClientID       ClientID        `json:"client_id"`
+	PaymentNumber  string          `json:"payment_number"`
+	AmountCents    int64           `json:"amount_cents"`
+	CurrencyCode   string          `json:"currency_code"`
+	PaymentMethod  string           `json:"payment_method"`
+	ReferenceNumber string         `json:"reference_number"`
+	ReceivedAt     time.Time       `json:"received_at"`
+	CreatedBy      *UserID          `json:"created_by,omitempty"`
+	CreatedAt      time.Time       `json:"created_at"`
+	Version        int             `json:"version"`
 }
 
 type BillingAllocation struct {
-	ID              string
-	ClientPaymentID  ClientPaymentID
-	BillingRecordID  BillingRecordID
-	AmountCents     int64
-	AllocatedAt     time.Time
-	CreatedAt       time.Time
+	ID              string           `json:"id"`
+	ClientPaymentID  ClientPaymentID  `json:"client_payment_id"`
+	BillingRecordID  BillingRecordID `json:"billing_record_id"`
+	AmountCents     int64            `json:"amount_cents"`
+	AllocatedAt     time.Time        `json:"allocated_at"`
+	CreatedAt       time.Time        `json:"created_at"`
 }
 
 // --- Audit action constants for workflow ---
