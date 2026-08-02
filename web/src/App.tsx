@@ -5,6 +5,12 @@ import { LoginPage } from './auth/LoginPage'
 import { AppShell } from './app/AppShell'
 import { DashboardPage } from './dashboard/DashboardPage'
 import { QuotationsPage } from './quotations/QuotationsPage'
+import { FundingRequestsPage } from './funding/FundingRequestsPage'
+import { DisbursementsPage } from './disbursements/DisbursementsPage'
+import { LiquidationsPage } from './liquidations/LiquidationsPage'
+import { BillingPage } from './billing/BillingPage'
+import { CollectionsPage } from './collections/CollectionsPage'
+import { DocumentsPage } from './documents/DocumentsPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -53,15 +59,15 @@ export default function App() {
     try {
       await api.logout()
     } catch {
-      // Ignore: session may be expired
+      // Session may be expired
     }
     setAuthenticated(false)
   }
 
   if (authenticated === null) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[hsl(var(--surface))]">
-        <p className="text-[hsl(var(--content-muted))]">Loading…</p>
+      <div className="flex min-h-screen items-center justify-center bg-[hsl(var(--ui-background))]">
+        <p className="text-[hsl(var(--text-03))]">Loading...</p>
       </div>
     )
   }
@@ -75,14 +81,12 @@ export default function App() {
       <AppShell onLogout={handleLogout}>
         {route === 'dashboard' && <DashboardPage />}
         {route === 'quotations' && <QuotationsPage />}
-        {(route === 'funding' || route === 'disbursements' || route === 'liquidations' || route === 'billing' || route === 'collections' || route === 'documents') && (
-          <div className="flex flex-col gap-4">
-            <h1 className="text-xl font-semibold text-[hsl(var(--content))]">
-              {route.charAt(0).toUpperCase() + route.slice(1)}
-            </h1>
-            <p className="text-sm text-[hsl(var(--content-muted))]">This section is ready for implementation.</p>
-          </div>
-        )}
+        {route === 'funding' && <FundingRequestsPage />}
+        {route === 'disbursements' && <DisbursementsPage />}
+        {route === 'liquidations' && <LiquidationsPage />}
+        {route === 'billing' && <BillingPage />}
+        {route === 'collections' && <CollectionsPage />}
+        {route === 'documents' && <DocumentsPage />}
       </AppShell>
     </QueryClientProvider>
   )
