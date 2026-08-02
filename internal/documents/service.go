@@ -102,7 +102,7 @@ func (s *DocumentService) Upload(ctx context.Context, actor domain.UserID, entit
 }
 
 // Download retrieves a document by ID. The caller must verify that the
-// authenticated user is authorized to access the parent entity — this method
+// authenticated user is authorized to access the parent entity. This method
 // does not perform authorization checks itself. The route handler handles
 // that via RequireAuth and entity ownership verification.
 func (s *DocumentService) Download(ctx context.Context, documentID string) (content []byte, contentType string, documentName string, err error) {

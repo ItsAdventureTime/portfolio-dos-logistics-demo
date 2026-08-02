@@ -1,4 +1,4 @@
-# DOS FreightFlow Control — Implementation Guide
+# DOS FreightFlow Control: Implementation Guide
 
 This repository holds the implementation of DOS FreightFlow Control, a private
 B2B workspace for freight movement and the related financial controls. The
@@ -28,7 +28,7 @@ The spec is firm about what we can and can't use:
 - **Inputs**: only `docs/spec/` (the specification documents and approved DOS
   PNG assets) and public technical references. Original decisions, source,
   tests, fixtures, and documentation are fair game.
-- **Off limits**: the earlier working demo — its source, tests, migrations,
+- **Off limits**: the earlier working demo: its source, tests, migrations,
   screenshots, styles, markup, copy, and Git history. It's not in this repo,
   and we don't reference it.
 - **Originality**: build with original source, UI composition, copy, and test
@@ -45,7 +45,7 @@ The spec is firm about what we can and can't use:
 
 These decisions are recorded in `DECISIONS.md`:
 
-- **Backend**: Go modular monolith — Chi, pgx, sqlc, goose, PostgreSQL
+- **Backend**: Go modular monolith: Chi, pgx, sqlc, goose, PostgreSQL
 - **Frontend**: React 19 + TypeScript + Vite + React Aria Components +
   TanStack Table v8 / Query + React Hook Form + Zod + Tailwind v4
 - **Gateway**: Caddy
@@ -56,9 +56,9 @@ These decisions are recorded in `DECISIONS.md`:
 Stages 1 through 5 are complete:
 
 - Stage 1: contract confirmed, decision log seeded, spec copied read-only
-- Stage 2: foundation — runtimes, linting, testing, health endpoint, CI
-- Stage 3: identity and authorization — users, sessions, OTP, CSRF, audit
-- Stage 4: workflow slices — quotation through collection
+- Stage 2: foundation: runtimes, linting, testing, health endpoint, CI
+- Stage 3: identity and authorization: users, sessions, OTP, CSRF, audit
+- Stage 4: workflow slices: quotation through collection
 - Stage 5: documents and demonstration data
 
 ## Final report

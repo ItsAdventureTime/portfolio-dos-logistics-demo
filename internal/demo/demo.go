@@ -103,7 +103,7 @@ func Seed() *DemoFixtures {
 			Subtotal:        4250000, // $42,500.00
 			TaxAmount:       0,
 			Total:           4250000,
-			Notes:           "Ocean freight - 40ft container, Manila to LA",
+			Notes:           "Ocean freight: 40ft container, Manila to LA",
 			CreatedBy:       &admin.ID,
 			CreatedAt:       now,
 			UpdatedAt:       now,
@@ -124,7 +124,7 @@ func Seed() *DemoFixtures {
 			Subtotal:        1850000,
 			TaxAmount:       0,
 			Total:           1850000,
-			Notes:           "Air freight - JFK to Heathrow",
+			Notes:           "Air freight: JFK to Heathrow",
 			CreatedBy:       &coordinator.ID,
 			CreatedAt:       now,
 			UpdatedAt:       now,
@@ -203,7 +203,7 @@ func (s *ResetService) Reset(
 // as a demonstration, for display in the UI.
 func EnvironmentMarker(env string) string {
 	if env == "demo" || env == "development" {
-		return fmt.Sprintf("DEMONSTRATION ENVIRONMENT — %s", env)
+		return fmt.Sprintf("DEMONSTRATION ENVIRONMENT: %s", env)
 	}
 	return ""
 }

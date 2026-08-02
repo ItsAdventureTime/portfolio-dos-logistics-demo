@@ -108,13 +108,13 @@ func TestReset_RemovesOnlyDemoRecords(t *testing.T) {
 
 	// Non-demo records must survive.
 	if !users["real-user-001"] {
-		t.Error("real-user-001 was removed — reset must not touch non-demo records")
+		t.Error("real-user-001 was removed. Reset must not touch non-demo records")
 	}
 	if !users["real-user-002"] {
-		t.Error("real-user-002 was removed — reset must not touch non-demo records")
+		t.Error("real-user-002 was removed. Reset must not touch non-demo records")
 	}
 	if !clients["real-client-001"] {
-		t.Error("real-client-001 was removed — reset must not touch non-demo records")
+		t.Error("real-client-001 was removed. Reset must not touch non-demo records")
 	}
 
 	// Demo records must be gone.

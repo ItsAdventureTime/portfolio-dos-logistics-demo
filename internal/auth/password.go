@@ -56,7 +56,7 @@ func NeedsRehash(encodedHash string) bool {
 }
 
 // DummyHash returns a pre-computed hash so that login timing stays consistent
-// even when the username doesn't exist. This keeps auth errors neutral — the
+// even when the username doesn't exist. This keeps auth errors neutral. The
 // caller can't tell whether the account was found.
 func DummyHash() string {
 	salt := make([]byte, argon2SaltLength)

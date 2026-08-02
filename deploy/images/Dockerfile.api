@@ -12,7 +12,7 @@ RUN apk add --no-cache git ca-certificates
 
 WORKDIR /build
 
-# Cache module downloads — copy go files first.
+# Cache module downloads - copy go files first.
 COPY go.mod go.sum ./
 RUN go mod download
 
@@ -46,7 +46,7 @@ USER dos
 
 EXPOSE 8080
 
-# Health check — the API serves /healthz on loopback.
+# Health check - the API serves /healthz on loopback.
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 --start-period=10s \
     CMD wget -qO- http://127.0.0.1:8080/healthz || exit 1
 

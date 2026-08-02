@@ -4,7 +4,7 @@ Every architecture choice that moves away from the spec's suggestions lives
 here. The spec is clear about what it wants: requirements (`01`), domain
 invariants (`02`), security boundaries (`03`), and the acceptance matrix
 (`05`) are all mandatory. Languages, frameworks, folder structure, and build
-order are recommendations — we can take a different path as long as we write
+order are recommendations. We can take a different path as long as we write
 down why, what we traded away, what evidence backs the call, and how we'd
 roll back.
 
@@ -15,7 +15,7 @@ plan. Dates are ISO 8601. A record's status is either `Accepted` or marked
 
 ---
 
-## ADR-001 — Backend: Go with Chi
+## ADR-001: Backend: Go with Chi
 
 **Date**: 2026-08-01 · **Status**: Accepted
 
@@ -23,17 +23,17 @@ plan. Dates are ISO 8601. A record's status is either `Accepted` or marked
 
 The spec suggests FastAPI for the API layer, and that's a solid default. But
 the domain needs version-checked state transitions, immutable finalized
-financials, and an append-only audit table — all things that benefit from
+financials, and an append-only audit table. All things that benefit from
 having the database enforce the rules directly. The acceptance matrix also
 demands negative-path test coverage and a tested rollback path.
 
 ### Options
 
-1. **FastAPI + SQLAlchemy 2 + Alembic** (spec default) — mature auth
+1. **FastAPI + SQLAlchemy 2 + Alembic** (spec default) - mature auth
    ecosystem, excellent pytest ergonomics, lowest deviation risk.
-2. **NestJS + Fastify + Prisma** — great end-to-end TypeScript typing, but
+2. **NestJS + Fastify + Prisma** - great end-to-end TypeScript typing, but
    Prisma fights you when you need INSERT-only triggers and raw audit tables.
-3. **Go + Chi + pgx + sqlc + goose** — smallest deployment footprint,
+3. **Go + Chi + pgx + sqlc + goose** - smallest deployment footprint,
    strongest transactional control, single static binary. The cost is more
    manual wiring for auth and CSRF.
 
@@ -60,7 +60,7 @@ permissively licensed libraries.
 2026 Go modular-monolith templates use this exact combination (Chi + pgx +
 sqlc + goose) with OpenAPI contract gates. A Go event-sourcing reference
 built the same year demonstrates append-only `BIGSERIAL` audit columns and
-`SELECT ... FOR UPDATE` concurrency in a single binary — mirroring what our
+`SELECT ... FOR UPDATE` concurrency in a single binary, mirroring what our
 domain spec asks for.
 
 ### Rollback
@@ -72,7 +72,7 @@ layer. Record the reversion as ADR-001a.
 
 ---
 
-## ADR-002 — Frontend: React 19 + React Aria Components + TanStack Table
+## ADR-002: Frontend: React 19 + React Aria Components + TanStack Table
 
 **Date**: 2026-08-01 · **Status**: Accepted · **Revises**: original draft that
 considered shadcn/ui.
@@ -80,7 +80,7 @@ considered shadcn/ui.
 ### Context
 
 The spec asks for React/Vite on the web side. The design guidelines (`08`)
-require an original DOS token layer and original component composition — no
+require an original DOS token layer and original component copied composition. No
 copied component source from IBM Carbon, Microsoft Fluent 2, or the earlier
 demo. The acceptance matrix wants dense operational tables, keyboard
 navigation, no horizontal overflow, and WCAG 2.2 AA compliance at three
@@ -92,22 +92,22 @@ copy-in model. We import primitives as packages and compose them ourselves.
 
 ### Options
 
-1. **Radix UI** (MIT, imported as packages) — passes all 11 axe patterns,
+1. **Radix UI** (MIT, imported as packages) - passes all 11 axe patterns,
    strongest fit for original composition, but the most manual wiring.
-2. **shadcn/ui** (Radix-on-Tailwind, source copied into repo) — fastest to
+2. **shadcn/ui** (Radix-on-Tailwind, source copied into repo) - fastest to
    start, but the copy-in model conflicts with the "no copied component
    source" rule. Ruled out.
-3. **React Aria Components** (Apache-2.0, imported as packages) — strictest
+3. **React Aria Components** (Apache-2.0, imported as packages) - strictest
    WAI-ARIA APG conformance, cleanest audit story, composition is ours.
-4. Headless UI, Ark UI, Mantine, or fully hand-built — all considered, all
+4. Headless UI, Ark UI, Mantine, or fully hand-built - all considered, all
    rejected for narrower surface area, documented axe failures, or more code
    than a standards-derived library warrants.
 
 ### Decision
 
 React Aria Components, imported as packages (no vendored source). We apply
-shadcn-style theming conventions to our token layer — semantic CSS variables
-in `globals.css`, HSL channels, Tailwind v4 `@theme` registration — but no
+shadcn-style theming conventions to our token layer: semantic CSS variables
+in `globals.css`, HSL channels, Tailwind v4 `@theme` registration. No
 shadcn component source enters this repository.
 
 Supporting stack:
@@ -115,7 +115,7 @@ Supporting stack:
 - React 19 + TypeScript + Vite 7 (strict mode)
 - TanStack Table v8 (headless, ~15 KB) for operational tables
 - TanStack Query for server state (first-class mutations, DevTools, cache
-  control — chosen over SWR for enterprise needs)
+  control, chosen over SWR for enterprise needs)
 - React Hook Form + Zod for forms and validation
 - Tailwind CSS v4 with the `@theme` directive
 - Vitest + Testing Library + axe-core (Playwright e2e)
@@ -124,18 +124,18 @@ Supporting stack:
 ### Tradeoffs
 
 React Aria's keyboard contracts come from the WAI-ARIA Authoring Practices
-Guide directly — Home/End in comboboxes, Escape on hover-tooltips, focus
+Guide directly: Home/End in comboboxes, Escape on hover-tooltips, focus
 management on ArrowDown. They ship the spec, not a subset. That satisfies our
 accessibility checks without overrides.
 
 The full bundle is ~95 KB (tree-shakeable), heavier than Radix per-primitive
 but comparable in practice. Building our own component composition is more
-work than copying in shadcn — but that's the originality requirement.
+work than copying in shadcn, but that's the originality requirement.
 
 ### Evidence
 
 A May 2026 axe-core audit of seven React component libraries gave React Aria
-Components a clean pass on all 11 ARIA patterns in its default state — the
+Components a clean pass on all 11 ARIA patterns in its default state. The
 strictest APG conformance in the field. 2026 comparisons favor TanStack Query
 over SWR for dashboards that need mutations and granular cache control.
 
@@ -148,7 +148,7 @@ ADR-002a.
 
 ---
 
-## ADR-003 — State Machine: looplab/fsm with DB version checks
+## ADR-003: State Machine: looplab/fsm with DB version checks
 
 **Date**: 2026-08-01 · **Status**: Accepted
 
@@ -161,9 +161,9 @@ history. Finalized financials can't be edited in place.
 
 ### Options
 
-1. Hand-rolled transition tables per entity — full control, more code.
+1. Hand-rolled transition tables per entity - full control, more code.
 2. `looplab/fsm` (Apache-2.0) with callbacks for guards and on-enter audit.
-3. An external workflow engine like Temporal — overkill for a single-tenant
+3. An external workflow engine like Temporal - overkill for a single-tenant
    modular monolith.
 
 ### Decision
@@ -171,7 +171,7 @@ history. Finalized financials can't be edited in place.
 `looplab/fsm` v1.0.3, one instance per record type. Guards validate version,
 actor, fields, and evidence before each transition. An on-enter callback
 writes the audit event. The database `version` column updates through
-`UPDATE ... WHERE version = $expected RETURNING version` — if zero rows come
+`UPDATE ... WHERE version = $expected RETURNING version`. If zero rows come
 back, the caller gets a 409.
 
 ### Tradeoffs
@@ -184,11 +184,11 @@ layer.
 ### Rollback
 
 Swap to hand-rolled transition tables without changing service-layer call
-sites — the FSM sits behind an interface. Record as ADR-003a.
+sites - the FSM sits behind an interface. Record as ADR-003a.
 
 ---
 
-## ADR-004 — Auth Libraries: MIT/BSD/Apache Only, No GPL
+## ADR-004: Auth Libraries: MIT/BSD/Apache Only, No GPL
 
 **Date**: 2026-08-01 · **Status**: Accepted
 
@@ -203,18 +203,18 @@ application.
 
 ### Options
 
-1. `cplieger/auth` (GPL-3.0) — complete set of primitives, but the license
+1. `cplieger/auth` (GPL-3.0) - complete set of primitives, but the license
    is a blocker.
 2. Compose permissively licensed libraries: `alexedwards/scs` (MIT) for
    sessions, `justinas/nosurf` (MIT) for CSRF, `golang.org/x/crypto/argon2`
    (BSD-3) for hashing, `pquerna/otp` (Apache-2.0) for TOTP,
    `golang.org/x/time/rate` (BSD) for throttling.
-3. Build everything from scratch — unnecessary reinvention.
+3. Build everything from scratch: unnecessary reinvention.
 
 ### Decision
 
 Option 2. We use `cplieger/auth` as a design reference for OWASP parameters,
-cookie prefixes, and session-hash-only storage patterns — but we do not
+cookie prefixes, and session-hash-only storage patterns, but we do not
 import it.
 
 ### Rollback
@@ -224,7 +224,7 @@ interface. Record as ADR-004a.
 
 ---
 
-## ADR-005 — Data Access: sqlc + goose + squirrel, No ORM
+## ADR-005: Data Access: sqlc + goose + squirrel, No ORM
 
 **Date**: 2026-08-01 · **Status**: Accepted
 
@@ -238,7 +238,7 @@ upgrade path.
 
 ### Decision
 
-`sqlc` generates typed Go from SQL — the database is the source of truth, and
+`sqlc` generates typed Go from SQL; the database is the source of truth, and
 schema/query mismatches surface at compile time. `goose` handles `up`/`down`
 migrations for both fresh and upgrade paths. `squirrel` composes dynamic
 query filters safely without string concatenation.
@@ -246,11 +246,11 @@ query filters safely without string concatenation.
 ### Rollback
 
 Add `squirrel` incrementally if dynamic query needs grow. `sqlc` and `goose`
-stay. No full rollback needed — this is additive.
+stay. No full rollback needed; this is additive.
 
 ---
 
-## ADR-006 — Logging: slog JSON with Correlation IDs and Redaction
+## ADR-006: Logging: slog JSON with Correlation IDs and Redaction
 
 **Date**: 2026-08-01 · **Status**: Accepted
 
@@ -270,7 +270,7 @@ redaction filter scrubs sensitive keys before emit.
 
 ### Tradeoffs
 
-Zero extra dependencies — the supply chain stays small. JSON output
+Zero extra dependencies. The supply chain stays small. JSON output
 integrates cleanly with journald and Caddy logs. `slog` is less performant
 than `zap` at extreme throughput, but that's irrelevant at single-tenant
 scale.
@@ -282,7 +282,7 @@ interface without changing call sites. Record as ADR-006a.
 
 ---
 
-## ADR-007 — Deployment: Caddy + Rootless Podman Quadlet
+## ADR-007: Deployment: Caddy + Rootless Podman Quadlet
 
 **Date**: 2026-08-01 · **Status**: Accepted
 
@@ -303,7 +303,7 @@ to loopback only.
 No root daemon, per-service user identity, native journald and health-check
 integration. The Quadlet units use `DropCapability=ALL`, `ReadOnly=true`,
 `Tmpfs=/tmp`, `NoNewPrivileges=true`, `--security-opt label=disable`, and
-resource limits — matching the 2026 hardening baseline.
+resource limits, matching the 2026 hardening baseline.
 
 Networking uses `pasta` (from the `passt` package) instead of the older
 `slirp4netns`. Pasta is the recommended rootless network backend in current
@@ -316,7 +316,7 @@ we keep a `golang:bookworm` slim fallback in case native dependencies appear.
 
 ### Evidence
 
-A 2026 production guide confirms this pattern end to end — Quadlet units,
+A 2026 production guide confirms this pattern end to end: Quadlet units,
 secrets in `chmod 600` env files, image digests pinned after (not before) the
 full build and startup checks pass, Caddy reverse proxy with HSTS.
 
@@ -324,5 +324,5 @@ full build and startup checks pass, Caddy reverse proxy with HSTS.
 
 If Podman proves unstable on the target VPS, troubleshoot the Quadlet units
 and rootless configuration first. Docker is not a fallback option for this
-project — rootless Podman is the only container runtime. Record any
+project. Rootless Podman is the only container runtime. Record any
 configuration fix as ADR-007a.

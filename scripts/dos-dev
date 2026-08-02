@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# dos-dev — run build, test, and lint tooling inside Podman containers.
+# dos-dev: run build, test, and lint tooling inside Podman containers.
 # Nothing compiles or executes on the host. The repo mounts read-write but
 # tooling binaries live inside ephemeral containers that are discarded after
 # each run.

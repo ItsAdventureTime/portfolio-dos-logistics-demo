@@ -37,7 +37,7 @@ type EmailChallengeRepository interface {
 }
 
 // AuditEventRepository writes append-only audit events. There is no Update
-// or Delete method — that's intentional.
+// or Delete method. That's intentional.
 type AuditEventRepository interface {
 	Create(ctx context.Context, e *domain.AuditEvent) error
 }

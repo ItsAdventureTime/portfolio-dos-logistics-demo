@@ -8,7 +8,7 @@ FROM node:22-alpine AS builder
 
 WORKDIR /build
 
-# Cache dependency install — copy lock files first.
+# Cache dependency install - copy lock files first.
 COPY web/package.json web/package-lock.json ./
 RUN npm ci --silent
 

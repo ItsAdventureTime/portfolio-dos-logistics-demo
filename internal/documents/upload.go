@@ -1,7 +1,7 @@
 // Package documents handles safe document upload validation and private
 // storage. Uploads are checked for size, file type, extension, content
 // sniff, and storage-key safety. Files are served behind authenticated
-// authorization checks — never publicly.
+// authorization checks, never publicly.
 package documents
 
 import (
@@ -108,11 +108,11 @@ func ValidateUpload(header *multipartFileHeader, content []byte, entityType, ent
 	// Special case: xlsx is a zip, so zip detection covers xlsx.
 	if detectedType != declaredType {
 		if declaredType == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" && detectedType == "application/zip" {
-			// OK — xlsx files are zip archives
+			// OK: xlsx files are zip archives
 		} else if declaredType == "application/vnd.ms-excel" && detectedType == "application/zip" {
-			// OK — some xls files are also zip-based
+			// OK: some xls files are also zip-based
 		} else if declaredType == "text/csv" {
-			// CSV is text, no magic bytes — allow if content is printable ASCII/UTF-8
+			// CSV is text, no magic bytes. Allow if content is printable ASCII/UTF-8
 		} else {
 			return nil, fmt.Errorf("%w: declared %s but content matches %s", ErrContentMismatch, declaredType, detectedType)
 		}

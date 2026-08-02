@@ -76,7 +76,7 @@ sudo loginctl enable-linger dos
 sudo apt-get install -y podman uidmap passt fuse-overlayfs
 ```
 
-`enable-linger` keeps services running after logout — without it, all
+`enable-linger` keeps services running after logout. Without it, all
 containers stop when the user session ends.
 
 `passt` provides the pasta rootless network backend, which is the
@@ -153,7 +153,7 @@ podman ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 ### 7. Pin image digests
 
 After all checks pass, pin architecture-specific digests. Using `:latest`
-in production is an anti-pattern — pin a specific digest so deployments
+in production is an anti-pattern. Pin a specific digest so deployments
 are reproducible and rollbacks are clean.
 
 ```sh
@@ -198,15 +198,15 @@ entries to your central log store.
 ## Security checklist
 
 - All containers run as non-root users
-- `DropCapability=ALL` — no Linux capabilities
-- `ReadOnly=true` with `Tmpfs=/tmp` — read-only root filesystem
-- `NoNewPrivileges=true` — no setuid escalation
-- `--security-opt label=disable` — avoids SELinux label conflicts in rootless mode
-- `Network=pasta` — modern rootless networking with no NAT overhead
+- `DropCapability=ALL`: no Linux capabilities
+- `ReadOnly=true` with `Tmpfs=/tmp`: read-only root filesystem
+- `NoNewPrivileges=true`: no setuid escalation
+- `--security-opt label=disable`: avoids SELinux label conflicts in rootless mode
+- `Network=pasta`: modern rootless networking with no NAT overhead
 - Secrets in `chmod 600` env files, never committed
 - Caddy sets HSTS, nosniff, DENY frame, no-referrer
-- API binds to loopback only — no direct public access
+- API binds to loopback only: no direct public access
 - Health checks on all services with `HealthStartPeriod` grace time
 - Image digests pinned after acceptance checks pass
 - `enable-linger` set so services survive logout
-- No Docker daemon — rootless Podman only
+- No Docker daemon: rootless Podman only

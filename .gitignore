@@ -37,7 +37,7 @@ vendor/
 /.data/
 /tmp/
 
-# Secrets — never commit
+# Secrets - never commit
 *.pem
 *.key
 *.p12

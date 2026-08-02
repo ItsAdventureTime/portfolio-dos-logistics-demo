@@ -87,7 +87,7 @@ func TestLogin_WrongPassword_NeutralError(t *testing.T) {
 	if !errors.Is(err, ErrInvalidCredentials) {
 		t.Errorf("expected ErrInvalidCredentials for wrong password, got %v", err)
 	}
-	// Both unknown-user and wrong-password return the same error — neutral.
+	// Both unknown-user and wrong-password return the same error: neutral.
 	events := audit.Events()
 	if len(events) != 1 {
 		t.Fatalf("expected 1 audit event, got %d", len(events))

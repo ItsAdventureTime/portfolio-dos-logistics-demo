@@ -47,7 +47,7 @@ func TestHealthReady(t *testing.T) {
 	}
 }
 
-// TestBootSmoke verifies the server boots and the health endpoint responds —
+// TestBootSmoke verifies the server boots and the health endpoint responds.
 // the Stage 2 "minimal application boot test" per 06-implementation-plan.md.
 func TestBootSmoke(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/healthz", nil)

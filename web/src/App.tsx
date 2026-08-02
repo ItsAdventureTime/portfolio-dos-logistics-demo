@@ -53,7 +53,7 @@ export default function App() {
     try {
       await api.logout()
     } catch {
-      // Ignore — session may be expired
+      // Ignore: session may be expired
     }
     setAuthenticated(false)
   }

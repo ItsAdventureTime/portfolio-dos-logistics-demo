@@ -1,4 +1,4 @@
-# DOS FreightFlow Control — Web Client
+# DOS FreightFlow Control: Web Client
 
 The frontend for DOS FreightFlow Control, built with React 19, TypeScript,
 Vite, and Tailwind CSS v4. Component primitives come from React Aria Components

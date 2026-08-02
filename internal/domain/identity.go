@@ -1,5 +1,5 @@
 // Package domain defines the core business types for identity, audit, and
-// workflow records. These types are stack-agnostic — they depend on no
+// workflow records. These types are stack-agnostic. They depend on no
 // transport, database driver, or framework.
 package domain
 
@@ -20,7 +20,7 @@ type SessionID string
 type RolePreview string
 
 const (
-	// RolePreviewNone is the default — the Administrator sees the full set.
+	// RolePreviewNone is the default. The Administrator sees the full set.
 	RolePreviewNone RolePreview = ""
 	// RolePreviewLogisticsCoordinator simulates the logistics coordinator view.
 	RolePreviewLogisticsCoordinator RolePreview = "logistics_coordinator"

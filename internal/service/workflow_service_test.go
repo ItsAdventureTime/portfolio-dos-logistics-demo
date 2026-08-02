@@ -183,7 +183,7 @@ func TestCreateDisbursement_IdempotencyCheck(t *testing.T) {
 	_, _ = svc.TransitionBudgetRequest(context.Background(), br.ID, domain.BudgetRequestStatusApproved, 2, actor(), "ok")
 	d1, _ := svc.CreateDisbursement(context.Background(), actor(), br.ID, fs.ID, 50000, "USD", "ref1", "")
 	d2, _ := svc.CreateDisbursement(context.Background(), actor(), br.ID, fs.ID, 50000, "USD", "ref1", "")
-	// Two disbursements are created, but with different IDs — the service layer
+	// Two disbursements are created, but with different IDs. The service layer
 	// should use idempotency keys in production to prevent duplicates.
 	// Here we verify they're distinct records (the test proves the store works).
 	if d1.ID == d2.ID { t.Error("disbursement IDs should be unique") }
@@ -228,7 +228,7 @@ func TestBilling_FinalizedCannotEditInPlace(t *testing.T) {
 	_, _ = svc.TransitionBilling(context.Background(), b.ID, domain.BillingStatusReview, b.Version, actor())
 	_, _ = svc.TransitionBilling(context.Background(), b.ID, domain.BillingStatusApproved, 2, actor())
 	_, _ = svc.TransitionBilling(context.Background(), b.ID, domain.BillingStatusFinalized, 3, actor())
-	// Try to edit in place — should fail.
+	// Try to edit in place. Should fail.
 	finalized, _ := billing.GetByID(context.Background(), b.ID)
 	if !domain.IsBillingImmutable(finalized.Status) {
 		t.Error("finalized billing should be immutable")
@@ -277,7 +277,7 @@ func TestAllocation_CrossClient_Rejected(t *testing.T) {
 	_, _ = svc.TransitionBilling(context.Background(), b.ID, domain.BillingStatusReview, b.Version, actor())
 	_, _ = svc.TransitionBilling(context.Background(), b.ID, domain.BillingStatusApproved, 2, actor())
 	_, _ = svc.TransitionBilling(context.Background(), b.ID, domain.BillingStatusFinalized, 3, actor())
-	// Try to allocate c1's payment to c2's billing — must fail.
+	// Try to allocate c1's payment to c2's billing. Must fail.
 	_, err := svc.AllocatePayment(context.Background(), actor(), p.ID, b.ID, 50000)
 	if !errors.Is(err, ErrAllocationClientMismatch) {
 		t.Errorf("expected ErrAllocationClientMismatch, got %v", err)

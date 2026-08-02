@@ -18,7 +18,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// Errors are deliberately neutral — they don't reveal whether an account
+// Errors are deliberately neutral. They don't reveal whether an account
 // exists.
 var (
 	ErrInvalidCredentials = errors.New("invalid credentials")
@@ -85,7 +85,7 @@ func (s *AuthService) Login(ctx context.Context, identifier, password, ip, userA
 
 	user, err := s.users.GetByUsernameOrEmail(ctx, identifier)
 	if err != nil {
-		// User not found — verify against a dummy hash to equalize timing,
+		// User not found. Verify against a dummy hash to equalize timing,
 		// then record a failed attempt with a neutral message.
 		_, _ = auth.VerifyPassword(password, auth.DummyHash())
 		s.auditLogin(ctx, nil, domain.AuditActionLoginFailed, corrID, ip, userAgent)
@@ -118,7 +118,7 @@ func (s *AuthService) Login(ctx context.Context, identifier, password, ip, userA
 		return &LoginResult{NeedsOTP: true, DisplayName: user.DisplayName}, nil
 	}
 
-	// Email verified — create a session.
+	// Email verified. Create a session.
 	token, hash, err := auth.GenerateSessionToken()
 	if err != nil {
 		return nil, fmt.Errorf("generate session: %w", err)
