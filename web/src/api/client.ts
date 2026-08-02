@@ -200,6 +200,7 @@ export interface Liquidation {
   released_amount: number
   actual_amount: number
   variance_amount: number
+  notes?: string
   version: number
 }
 
@@ -210,6 +211,7 @@ export interface BillingRecord {
   status: string
   currency_code: string
   total: number
+  notes?: string
   version: number
 }
 
@@ -219,6 +221,8 @@ export interface ClientPayment {
   payment_number: string
   amount_cents: number
   currency_code: string
+  payment_method?: string
+  reference_number?: string
   version: number
 }
 
