@@ -208,7 +208,7 @@ func (h *handler) SetRolePreview(w http.ResponseWriter, r *http.Request) {
 			"The selected role preview is not valid.")
 		return
 	}
-	tokenHash := auth.HashToken(ac.Session.TokenHash)
+	tokenHash := ac.Session.TokenHash
 	if err := h.svc.SetRolePreview(r.Context(), tokenHash, preview); err != nil {
 		if errors.Is(err, service.ErrSessionInvalid) {
 			writeError(w, http.StatusUnauthorized, "session_expired",

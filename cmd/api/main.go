@@ -43,10 +43,10 @@ func run() error {
 	if cfg.DemoMode {
 		bootstrapped := demo.Bootstrap(log)
 		srv.MountAuth(bootstrapped.AuthService, bootstrapped.OTPCfg)
-		log.Info("demo auth routes mounted",
+		srv.MountWorkflow(bootstrapped.QuotationService, bootstrapped.WorkflowService, bootstrapped.AuthService.ValidateSession)
+		log.Info("demo auth and workflow routes mounted",
 			"username", "admin",
 			"password", "Password123!",
-			"hint", "OTP codes are logged to stderr in demo mode",
 		)
 	}
 

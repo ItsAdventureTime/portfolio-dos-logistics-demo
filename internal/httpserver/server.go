@@ -10,8 +10,10 @@ import (
 
 	"github.com/ItsAdventureTime/portfolio-dos-logistics-demo/internal/auth"
 	"github.com/ItsAdventureTime/portfolio-dos-logistics-demo/internal/config"
+	"github.com/ItsAdventureTime/portfolio-dos-logistics-demo/internal/domain"
 	"github.com/ItsAdventureTime/portfolio-dos-logistics-demo/internal/httpserver/authhttp"
 	"github.com/ItsAdventureTime/portfolio-dos-logistics-demo/internal/httpserver/middleware"
+	"github.com/ItsAdventureTime/portfolio-dos-logistics-demo/internal/httpserver/workflowhttp"
 	"github.com/ItsAdventureTime/portfolio-dos-logistics-demo/internal/observability"
 	"github.com/ItsAdventureTime/portfolio-dos-logistics-demo/internal/service"
 	"github.com/go-chi/chi/v5"
@@ -69,6 +71,11 @@ func (s *Server) Router() *chi.Mux { return s.router }
 // MountAuth registers the auth routes on the server's router.
 func (s *Server) MountAuth(svc *service.AuthService, otpCfg auth.OTPConfig) {
 	authhttp.Mount(s.router, svc, otpCfg)
+}
+
+// MountWorkflow registers the workflow routes on the server's router.
+func (s *Server) MountWorkflow(qSvc *service.QuotationService, wSvc *service.WorkflowService, validateAuth func(ctx context.Context, tokenHash string) (*domain.Session, *domain.User, error)) {
+	workflowhttp.Mount(s.router, qSvc, wSvc, validateAuth)
 }
 
 // Start begins listening and blocks until the server stops.

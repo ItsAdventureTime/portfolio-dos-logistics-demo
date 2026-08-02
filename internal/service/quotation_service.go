@@ -232,6 +232,11 @@ func (s *QuotationService) ListQuotations(ctx context.Context, clientID *domain.
 	return s.quotations.List(ctx, clientID)
 }
 
+// ListClients returns all clients.
+func (s *QuotationService) ListClients(ctx context.Context) ([]*domain.Client, error) {
+	return s.clients.List(ctx)
+}
+
 func (s *QuotationService) auditQuotation(ctx context.Context, userID *domain.UserID, action, entityType, entityID string) {
 	corrID := observability.CorrelationFrom(ctx)
 	_ = s.audit.Create(ctx, &domain.AuditEvent{
