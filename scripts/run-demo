@@ -1,0 +1,54 @@
+#!/usr/bin/env sh
+# run-demo - start the DOS FreightFlow Control demo locally.
+# The API runs in demo mode with in-memory stores (no PostgreSQL needed).
+# The web client runs via Vite dev server.
+# Access the app at http://127.0.0.1:5173
+
+set -eu
+
+REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+
+# Kill any existing process on the ports.
+lsof -ti:8080 | xargs kill -9 2>/dev/null || true
+lsof -ti:5173 | xargs kill -9 2>/dev/null || true
+
+echo "Starting DOS FreightFlow Control demo..."
+echo ""
+
+# Start the API in demo mode.
+DEMO_MODE=true \
+APP_ENV=development \
+HTTP_ADDR=127.0.0.1:8080 \
+APP_DEV_CODE_VISIBLE=true \
+LOG_LEVEL=info \
+go run "$REPO_ROOT/cmd/api" &
+
+API_PID=$!
+sleep 2
+
+# Verify the API started.
+if ! curl -sf http://127.0.0.1:8080/healthz >/dev/null 2>&1; then
+  echo "ERROR: API failed to start. Check the logs above."
+  kill $API_PID 2>/dev/null
+  exit 1
+fi
+
+echo "API:  http://127.0.0.1:8080  (demo mode, in-memory stores)"
+echo "      Username: admin"
+echo "      Password: Password123!"
+echo ""
+
+# Start the web dev server.
+cd "$REPO_ROOT/web"
+npm run dev &
+WEB_PID=$!
+sleep 3
+
+echo "Web:  http://127.0.0.1:5173  (Vite dev server)"
+echo ""
+echo "Open http://127.0.0.1:5173 in your browser to access the demo."
+echo "Press Ctrl+C to stop both services."
+
+# Wait for either to exit.
+trap "kill $API_PID $WEB_PID 2>/dev/null; exit 0" INT TERM
+wait

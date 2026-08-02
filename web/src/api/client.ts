@@ -1,6 +1,6 @@
 import type { LoginResponse, User, Session } from '../types'
 
-const API_BASE = '/api'
+const API_BASE = ''
 
 function getCSRFToken(): string | null {
   const match = document.cookie.match(/__Host-dos_csrf=([^;]+)/)

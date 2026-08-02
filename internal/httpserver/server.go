@@ -8,9 +8,12 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/ItsAdventureTime/portfolio-dos-logistics-demo/internal/auth"
 	"github.com/ItsAdventureTime/portfolio-dos-logistics-demo/internal/config"
+	"github.com/ItsAdventureTime/portfolio-dos-logistics-demo/internal/httpserver/authhttp"
 	"github.com/ItsAdventureTime/portfolio-dos-logistics-demo/internal/httpserver/middleware"
 	"github.com/ItsAdventureTime/portfolio-dos-logistics-demo/internal/observability"
+	"github.com/ItsAdventureTime/portfolio-dos-logistics-demo/internal/service"
 	"github.com/go-chi/chi/v5"
 )
 
@@ -28,6 +31,24 @@ func New(cfg config.Config, log *slog.Logger) *Server {
 	r.Use(middleware.Timeout(cfg.ReadTimeout, cfg.WriteTimeout))
 	r.Use(middleware.SecurityHeaders)
 
+	// CORS for local dev (web client runs on a different port).
+	r.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			origin := r.Header.Get("Origin")
+			if origin != "" {
+				w.Header().Set("Access-Control-Allow-Origin", origin)
+				w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+				w.Header().Set("Access-Control-Allow-Headers", "Content-Type, X-CSRF-Token, X-Request-ID")
+				w.Header().Set("Access-Control-Allow-Credentials", "true")
+			}
+			if r.Method == http.MethodOptions {
+				w.WriteHeader(http.StatusOK)
+				return
+			}
+			next.ServeHTTP(w, r)
+		})
+	})
+
 	r.Get("/healthz", healthLiveness)
 	r.Get("/healthz/ready", healthReady)
 
@@ -44,6 +65,11 @@ func New(cfg config.Config, log *slog.Logger) *Server {
 // Router returns the underlying Chi router so feature modules can mount
 // their routes during Stage 3+.
 func (s *Server) Router() *chi.Mux { return s.router }
+
+// MountAuth registers the auth routes on the server's router.
+func (s *Server) MountAuth(svc *service.AuthService, otpCfg auth.OTPConfig) {
+	authhttp.Mount(s.router, svc, otpCfg)
+}
 
 // Start begins listening and blocks until the server stops.
 func (s *Server) Start() error { return s.srv.ListenAndServe() }

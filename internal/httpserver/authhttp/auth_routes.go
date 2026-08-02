@@ -164,7 +164,7 @@ func (h *handler) VerifyEmail(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) Logout(w http.ResponseWriter, r *http.Request) {
-	cookie, err := r.Cookie(middleware.SessionCookieName)
+	cookie, err := r.Cookie(middleware.SessionCookieNameFor())
 	if err == nil && cookie.Value != "" {
 		tokenHash := auth.HashToken(cookie.Value)
 		_ = h.svc.Logout(r.Context(), tokenHash)

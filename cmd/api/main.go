@@ -12,7 +12,9 @@ import (
 	"syscall"
 
 	"github.com/ItsAdventureTime/portfolio-dos-logistics-demo/internal/config"
+	"github.com/ItsAdventureTime/portfolio-dos-logistics-demo/internal/demo"
 	"github.com/ItsAdventureTime/portfolio-dos-logistics-demo/internal/httpserver"
+	"github.com/ItsAdventureTime/portfolio-dos-logistics-demo/internal/httpserver/middleware"
 	"github.com/ItsAdventureTime/portfolio-dos-logistics-demo/internal/observability"
 )
 
@@ -29,9 +31,24 @@ func run() error {
 		return err
 	}
 	log := observability.Logger(cfg.LogLevel)
-	log.Info("starting", "env", cfg.Env, "addr", cfg.HTTPAddr)
+
+	if cfg.DemoMode {
+		middleware.InDemoMode = true
+		log.Info("starting in demo mode (in-memory stores, no database)",
+			"env", cfg.Env, "addr", cfg.HTTPAddr)
+	}
 
 	srv := httpserver.New(cfg, log)
+
+	if cfg.DemoMode {
+		bootstrapped := demo.Bootstrap(log)
+		srv.MountAuth(bootstrapped.AuthService, bootstrapped.OTPCfg)
+		log.Info("demo auth routes mounted",
+			"username", "admin",
+			"password", "Password123!",
+			"hint", "OTP codes are logged to stderr in demo mode",
+		)
+	}
 
 	errCh := make(chan error, 1)
 	go func() {

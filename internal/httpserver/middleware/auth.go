@@ -12,14 +12,29 @@ import (
 
 type authCtxKey struct{}
 
-// SessionCookieName is the name of the session cookie.
-const SessionCookieName = "__Host-dos_session"
+// SessionCookieName returns the cookie name, adjusting for demo mode
+// where __Host- prefix requires HTTPS.
+func SessionCookieNameFor() string {
+	if InDemoMode {
+		return "dos_session"
+	}
+	return "__Host-dos_session"
+}
 
-// CSRFCookieName is the name of the CSRF double-submit cookie.
-const CSRFCookieName = "__Host-dos_csrf"
+// CSRFCookieNameFor returns the CSRF cookie name, adjusting for demo mode.
+func CSRFCookieNameFor() string {
+	if InDemoMode {
+		return "dos_csrf"
+	}
+	return "__Host-dos_csrf"
+}
 
 // CSRFHeaderName is the request header that must carry the CSRF token.
 const CSRFHeaderName = "X-CSRF-Token"
+
+// InDemoMode controls whether cookies use Secure and __Host- prefix.
+// In demo/development (HTTP), cookies must not be Secure.
+var InDemoMode = false
 
 // AuthContext holds the authenticated session and user for the current
 // request. Populated by RequireAuth and available to handlers via
@@ -42,7 +57,7 @@ func AuthFromContext(ctx context.Context) (*AuthContext, bool) {
 func RequireAuth(validate func(ctx context.Context, tokenHash string) (*domain.Session, *domain.User, error)) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			cookie, err := r.Cookie(SessionCookieName)
+			cookie, err := r.Cookie(SessionCookieNameFor())
 			if err != nil || cookie.Value == "" {
 				deny(w, r)
 				return
@@ -70,7 +85,7 @@ func RequireAuth(validate func(ctx context.Context, tokenHash string) (*domain.S
 func CSRF(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if isStateChanging(r.Method) {
-			cookie, err := r.Cookie(CSRFCookieName)
+			cookie, err := r.Cookie(CSRFCookieNameFor())
 			if err != nil || cookie.Value == "" {
 				http.Error(w, `{"error":{"code":"csrf_failed","message":"CSRF token missing"}}`, http.StatusForbidden)
 				return
@@ -114,33 +129,33 @@ func isBrowserRequest(r *http.Request) bool {
 
 func clearSessionCookie(w http.ResponseWriter) {
 	http.SetCookie(w, &http.Cookie{
-		Name:     SessionCookieName,
+		Name:     SessionCookieNameFor(),
 		Value:    "",
 		Path:     "/",
 		MaxAge:   -1,
-		Secure:   true,
+		Secure:   !InDemoMode,
 		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
+		SameSite: http.SameSiteLaxMode,
 	})
 }
 
 // SetSessionCookie sets the session cookie and a CSRF double-submit cookie.
 func SetSessionCookie(w http.ResponseWriter, sessionToken, csrfToken string) {
 	http.SetCookie(w, &http.Cookie{
-		Name:     SessionCookieName,
+		Name:     SessionCookieNameFor(),
 		Value:    sessionToken,
 		Path:     "/",
 		HttpOnly: true,
-		Secure:   true,
-		SameSite: http.SameSiteStrictMode,
+		Secure:   !InDemoMode,
+		SameSite: http.SameSiteLaxMode,
 	})
 	http.SetCookie(w, &http.Cookie{
-		Name:     CSRFCookieName,
+		Name:     CSRFCookieNameFor(),
 		Value:    csrfToken,
 		Path:     "/",
 		HttpOnly: false,
-		Secure:   true,
-		SameSite: http.SameSiteStrictMode,
+		Secure:   !InDemoMode,
+		SameSite: http.SameSiteLaxMode,
 	})
 }
 
@@ -148,12 +163,12 @@ func SetSessionCookie(w http.ResponseWriter, sessionToken, csrfToken string) {
 func ClearSessionCookie(w http.ResponseWriter) {
 	clearSessionCookie(w)
 	http.SetCookie(w, &http.Cookie{
-		Name:     CSRFCookieName,
+		Name:     CSRFCookieNameFor(),
 		Value:    "",
 		Path:     "/",
 		MaxAge:   -1,
-		Secure:   true,
-		SameSite: http.SameSiteStrictMode,
+		Secure:   !InDemoMode,
+		SameSite: http.SameSiteLaxMode,
 	})
 }
 
