@@ -1,13 +1,7 @@
+import { useQuery } from '@tanstack/react-query'
+import { api, type ClientPayment } from '../api/client'
 import { DataTable } from '../components/table/DataTable'
 import { type ColumnDef } from '@tanstack/react-table'
-
-interface ClientPayment {
-  id: string
-  payment_number: string
-  amount_cents: number
-  currency_code: string
-  version: number
-}
 
 function formatCurrency(cents: number, code: string): string {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: code }).format(cents / 100)
@@ -19,11 +13,17 @@ const columns: ColumnDef<ClientPayment, unknown>[] = [
   { header: 'Version', accessorKey: 'version', cell: ({ row }) => <span className="text-[hsl(var(--text-03))]">v{row.original.version}</span> },
 ]
 
-const mockData: ClientPayment[] = [
-  { id: 'demo-pay-001', payment_number: 'PMT-ACME-100001', amount_cents: 2000000, currency_code: 'USD', version: 1 },
-]
-
 export function CollectionsPage() {
+  const { data, isLoading, isError } = useQuery<{ payments: ClientPayment[] }>({
+    queryKey: ['payments'],
+    queryFn: () => api.listPayments(),
+  })
+
+  const items = data?.payments || []
+
+  if (isLoading) return <div className="h-64 animate-pulse rounded-[var(--radius-sm)] border border-[hsl(var(--border-subtle))] bg-[hsl(var(--ui-02))]" />
+  if (isError) return <div className="rounded-[var(--radius-sm)] border border-[hsl(var(--support-error))]/30 bg-[hsl(var(--support-error))]/10 p-4 text-sm text-[hsl(var(--support-error))]">Unable to load payments.</div>
+
   return (
     <div className="flex flex-col gap-5">
       <div>
@@ -31,10 +31,10 @@ export function CollectionsPage() {
         <p className="mt-0.5 text-sm text-[hsl(var(--text-03))]">Client payments and billing allocations</p>
       </div>
       <div className="hidden sm:block">
-        <DataTable columns={columns} data={mockData} caption="Client payments" emptyMessage="No payments recorded." zebra density="normal" />
+        <DataTable columns={columns} data={items} caption="Client payments" emptyMessage="No payments recorded." zebra density="normal" />
       </div>
       <div className="flex flex-col gap-3 sm:hidden">
-        {mockData.map((p) => (
+        {items.length === 0 ? <p className="rounded-[var(--radius-sm)] border border-[hsl(var(--border-subtle))] bg-[hsl(var(--ui-01))] p-6 text-center text-sm text-[hsl(var(--text-03))]">No payments recorded.</p> : items.map((p) => (
           <div key={p.id} className="rounded-[var(--radius-sm)] border border-[hsl(var(--border-subtle))] bg-[hsl(var(--ui-01))] p-4">
             <div className="flex items-center justify-between"><span className="font-medium text-[hsl(var(--text-01))]">{p.payment_number}</span><span className="text-[hsl(var(--text-03))]">v{p.version}</span></div>
             <p className="mt-2 text-sm text-[hsl(var(--text-01))]">{formatCurrency(p.amount_cents, p.currency_code)}</p>

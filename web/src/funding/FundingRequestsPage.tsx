@@ -1,7 +1,8 @@
+import { useQuery } from '@tanstack/react-query'
+import { api, type BudgetRequest } from '../api/client'
 import { DataTable } from '../components/table/DataTable'
 import { Badge, type StatusType } from '../components/feedback/Badge'
 import { type ColumnDef } from '@tanstack/react-table'
-import type { BudgetRequest } from '../api/client'
 
 const statusMap: Record<string, { status: StatusType; label: string }> = {
   draft: { status: 'neutral', label: 'Draft' },
@@ -24,6 +25,16 @@ const columns: ColumnDef<BudgetRequest, unknown>[] = [
 ]
 
 export function FundingRequestsPage() {
+  const { data, isLoading, isError } = useQuery<{ budget_requests: BudgetRequest[] }>({
+    queryKey: ['budget-requests'],
+    queryFn: () => api.listBudgetRequests(),
+  })
+
+  const items = data?.budget_requests || []
+
+  if (isLoading) return <div className="h-64 animate-pulse rounded-[var(--radius-sm)] border border-[hsl(var(--border-subtle))] bg-[hsl(var(--ui-02))]" />
+  if (isError) return <div className="rounded-[var(--radius-sm)] border border-[hsl(var(--support-error))]/30 bg-[hsl(var(--support-error))]/10 p-4 text-sm text-[hsl(var(--support-error))]">Unable to load funding requests.</div>
+
   return (
     <div className="flex flex-col gap-5">
       <div>
@@ -31,9 +42,17 @@ export function FundingRequestsPage() {
         <p className="mt-0.5 text-sm text-[hsl(var(--text-03))]">Shipment funding linked to accepted quotations</p>
       </div>
       <div className="hidden sm:block">
-        <DataTable columns={columns} data={[]} caption="Budget requests" emptyMessage="No funding requests found. Create one from an accepted quotation." zebra density="normal" />
+        <DataTable columns={columns} data={items} caption="Budget requests" emptyMessage="No funding requests found." zebra density="normal" />
       </div>
-      <p className="text-sm text-[hsl(var(--text-03))] sm:hidden">No funding requests found. Create one from an accepted quotation.</p>
+      <div className="flex flex-col gap-3 sm:hidden">
+        {items.length === 0 ? <p className="rounded-[var(--radius-sm)] border border-[hsl(var(--border-subtle))] bg-[hsl(var(--ui-01))] p-6 text-center text-sm text-[hsl(var(--text-03))]">No funding requests found.</p> : items.map((br) => { const c = statusMap[br.status] || statusMap.draft; return (
+          <div key={br.id} className="rounded-[var(--radius-sm)] border border-[hsl(var(--border-subtle))] bg-[hsl(var(--ui-01))] p-4">
+            <div className="flex items-center justify-between"><span className="font-medium text-[hsl(var(--text-01))]">{br.request_number}</span><Badge status={c.status}>{c.label}</Badge></div>
+            <p className="mt-2 text-sm text-[hsl(var(--text-03))]">{br.purpose}</p>
+            <div className="mt-3 flex items-center justify-between text-sm"><span className="text-[hsl(var(--text-01))]">{formatCurrency(br.amount_cents, br.currency_code)}</span><span className="text-[hsl(var(--text-03))]">v{br.version}</span></div>
+          </div>
+        ) })}
+      </div>
     </div>
   )
 }

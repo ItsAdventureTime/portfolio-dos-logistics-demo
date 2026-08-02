@@ -81,18 +81,21 @@ export const api = {
     request<Quotation>(`/api/quotations/${id}/transition`, { method: 'POST', body: JSON.stringify({ target_status, version }) }),
 
   // Budget requests
+  listBudgetRequests: () => request<{ budget_requests: BudgetRequest[] }>('/api/budget-requests'),
   createBudgetRequest: (data: { quotation_id: string; client_id: string; currency_code: string; purpose: string; amount_cents: number }) =>
     request<BudgetRequest>('/api/budget-requests', { method: 'POST', body: JSON.stringify(data) }),
   transitionBudgetRequest: (id: string, target_status: string, version: number) =>
     request<BudgetRequest>(`/api/budget-requests/${id}/transition`, { method: 'POST', body: JSON.stringify({ target_status, version }) }),
 
   // Disbursements
+  listDisbursements: () => request<{ disbursements: Disbursement[] }>('/api/disbursements'),
   createDisbursement: (data: { budget_request_id: string; funding_source_id: string; amount_cents: number; currency_code: string; reference_number?: string; notes?: string }) =>
     request<Disbursement>('/api/disbursements', { method: 'POST', body: JSON.stringify(data) }),
   transitionDisbursement: (id: string, target_status: string, version: number) =>
     request<Disbursement>(`/api/disbursements/${id}/transition`, { method: 'POST', body: JSON.stringify({ target_status, version }) }),
 
   // Liquidations
+  listLiquidations: () => request<{ liquidations: Liquidation[] }>('/api/liquidations'),
   createLiquidation: (disbursement_id: string, released_amount: number) =>
     request<Liquidation>('/api/liquidations', { method: 'POST', body: JSON.stringify({ disbursement_id, released_amount }) }),
   reconcileLiquidation: (id: string, actual_amount: number, version: number) =>
@@ -100,13 +103,18 @@ export const api = {
   closeLiquidation: (id: string, version: number) =>
     request<Liquidation>(`/api/liquidations/${id}/close`, { method: 'POST', body: JSON.stringify({ version }) }),
 
+  // Funding sources
+  listFundingSources: () => request<{ funding_sources: FundingSource[] }>('/api/funding-sources'),
+
   // Billing
+  listBilling: () => request<{ billing_records: BillingRecord[] }>('/api/billing'),
   createBilling: (data: { client_id: string; currency_code: string; lines: { description: string; quantity: number; unit_price: number }[] }) =>
     request<BillingRecord>('/api/billing', { method: 'POST', body: JSON.stringify(data) }),
   transitionBilling: (id: string, target_status: string, version: number) =>
     request<BillingRecord>(`/api/billing/${id}/transition`, { method: 'POST', body: JSON.stringify({ target_status, version }) }),
 
   // Collections
+  listPayments: () => request<{ payments: ClientPayment[] }>('/api/payments'),
   recordPayment: (data: { client_id: string; amount_cents: number; currency_code: string; payment_method?: string; reference_number?: string }) =>
     request<ClientPayment>('/api/payments', { method: 'POST', body: JSON.stringify(data) }),
   allocatePayment: (payment_id: string, billing_record_id: string, amount_cents: number) =>
@@ -152,6 +160,15 @@ export interface QuotationLine {
   line_total: number
 }
 
+export interface FundingSource {
+  id: string
+  name: string
+  code: string
+  is_approved: boolean
+  balance_cents: number
+  currency_code: string
+}
+
 export interface BudgetRequest {
   id: string
   quotation_id: string
@@ -171,6 +188,8 @@ export interface Disbursement {
   status: string
   amount_cents: number
   currency_code: string
+  reference_number?: string
+  notes?: string
   version: number
 }
 

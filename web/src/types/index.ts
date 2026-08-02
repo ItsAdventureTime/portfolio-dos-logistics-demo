@@ -73,6 +73,8 @@ export interface Disbursement {
   status: string
   amount_cents: number
   currency_code: string
+  reference_number?: string
+  notes?: string
   version: number
 }
 

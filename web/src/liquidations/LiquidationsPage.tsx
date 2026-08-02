@@ -1,15 +1,8 @@
+import { useQuery } from '@tanstack/react-query'
+import { api, type Liquidation } from '../api/client'
 import { DataTable } from '../components/table/DataTable'
 import { Badge, type StatusType } from '../components/feedback/Badge'
 import { type ColumnDef } from '@tanstack/react-table'
-
-interface Liquidation {
-  id: string
-  status: string
-  released_amount: number
-  actual_amount: number
-  variance_amount: number
-  version: number
-}
 
 const statusMap: Record<string, { status: StatusType; label: string }> = {
   open: { status: 'neutral', label: 'Open' },
@@ -29,11 +22,17 @@ const columns: ColumnDef<Liquidation, unknown>[] = [
   { header: 'Version', accessorKey: 'version', cell: ({ row }) => <span className="text-[hsl(var(--text-03))]">v{row.original.version}</span> },
 ]
 
-const mockData: Liquidation[] = [
-  { id: 'demo-liq-001', status: 'open', released_amount: 4250000, actual_amount: 0, variance_amount: 4250000, version: 1 },
-]
-
 export function LiquidationsPage() {
+  const { data, isLoading, isError } = useQuery<{ liquidations: Liquidation[] }>({
+    queryKey: ['liquidations'],
+    queryFn: () => api.listLiquidations(),
+  })
+
+  const items = data?.liquidations || []
+
+  if (isLoading) return <div className="h-64 animate-pulse rounded-[var(--radius-sm)] border border-[hsl(var(--border-subtle))] bg-[hsl(var(--ui-02))]" />
+  if (isError) return <div className="rounded-[var(--radius-sm)] border border-[hsl(var(--support-error))]/30 bg-[hsl(var(--support-error))]/10 p-4 text-sm text-[hsl(var(--support-error))]">Unable to load liquidations.</div>
+
   return (
     <div className="flex flex-col gap-5">
       <div>
@@ -41,10 +40,10 @@ export function LiquidationsPage() {
         <p className="mt-0.5 text-sm text-[hsl(var(--text-03))]">Reconcile released funds with actual spending</p>
       </div>
       <div className="hidden sm:block">
-        <DataTable columns={columns} data={mockData} caption="Liquidations" emptyMessage="No liquidations found." zebra density="normal" />
+        <DataTable columns={columns} data={items} caption="Liquidations" emptyMessage="No liquidations found." zebra density="normal" />
       </div>
       <div className="flex flex-col gap-3 sm:hidden">
-        {mockData.map((l) => { const c = statusMap[l.status] || statusMap.open; return (
+        {items.length === 0 ? <p className="rounded-[var(--radius-sm)] border border-[hsl(var(--border-subtle))] bg-[hsl(var(--ui-01))] p-6 text-center text-sm text-[hsl(var(--text-03))]">No liquidations found.</p> : items.map((l) => { const c = statusMap[l.status] || statusMap.open; return (
           <div key={l.id} className="rounded-[var(--radius-sm)] border border-[hsl(var(--border-subtle))] bg-[hsl(var(--ui-01))] p-4">
             <div className="flex items-center justify-between"><Badge status={c.status}>{c.label}</Badge><span className="text-[hsl(var(--text-03))]">v{l.version}</span></div>
             <div className="mt-3 flex flex-col gap-1 text-sm">

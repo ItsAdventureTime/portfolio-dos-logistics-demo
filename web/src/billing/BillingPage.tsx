@@ -1,15 +1,8 @@
+import { useQuery } from '@tanstack/react-query'
+import { api, type BillingRecord } from '../api/client'
 import { DataTable } from '../components/table/DataTable'
 import { Badge, type StatusType } from '../components/feedback/Badge'
 import { type ColumnDef } from '@tanstack/react-table'
-
-interface BillingRecord {
-  id: string
-  billing_number: string
-  status: string
-  currency_code: string
-  total: number
-  version: number
-}
 
 const statusMap: Record<string, { status: StatusType; label: string }> = {
   draft: { status: 'neutral', label: 'Draft' },
@@ -31,11 +24,17 @@ const columns: ColumnDef<BillingRecord, unknown>[] = [
   { header: 'Version', accessorKey: 'version', cell: ({ row }) => <span className="text-[hsl(var(--text-03))]">v{row.original.version}</span> },
 ]
 
-const mockData: BillingRecord[] = [
-  { id: 'demo-bill-001', billing_number: 'INV-ACME-100001', status: 'finalized', currency_code: 'USD', total: 4250000, version: 4 },
-]
-
 export function BillingPage() {
+  const { data, isLoading, isError } = useQuery<{ billing_records: BillingRecord[] }>({
+    queryKey: ['billing'],
+    queryFn: () => api.listBilling(),
+  })
+
+  const items = data?.billing_records || []
+
+  if (isLoading) return <div className="h-64 animate-pulse rounded-[var(--radius-sm)] border border-[hsl(var(--border-subtle))] bg-[hsl(var(--ui-02))]" />
+  if (isError) return <div className="rounded-[var(--radius-sm)] border border-[hsl(var(--support-error))]/30 bg-[hsl(var(--support-error))]/10 p-4 text-sm text-[hsl(var(--support-error))]">Unable to load billing records.</div>
+
   return (
     <div className="flex flex-col gap-5">
       <div>
@@ -43,10 +42,10 @@ export function BillingPage() {
         <p className="mt-0.5 text-sm text-[hsl(var(--text-03))]">Manage invoices and billing records</p>
       </div>
       <div className="hidden sm:block">
-        <DataTable columns={columns} data={mockData} caption="Billing records" emptyMessage="No billing records found." zebra density="normal" />
+        <DataTable columns={columns} data={items} caption="Billing records" emptyMessage="No billing records found." zebra density="normal" />
       </div>
       <div className="flex flex-col gap-3 sm:hidden">
-        {mockData.map((b) => { const c = statusMap[b.status] || statusMap.draft; return (
+        {items.length === 0 ? <p className="rounded-[var(--radius-sm)] border border-[hsl(var(--border-subtle))] bg-[hsl(var(--ui-01))] p-6 text-center text-sm text-[hsl(var(--text-03))]">No billing records found.</p> : items.map((b) => { const c = statusMap[b.status] || statusMap.draft; return (
           <div key={b.id} className="rounded-[var(--radius-sm)] border border-[hsl(var(--border-subtle))] bg-[hsl(var(--ui-01))] p-4">
             <div className="flex items-center justify-between"><span className="font-medium text-[hsl(var(--text-01))]">{b.billing_number}</span><Badge status={c.status}>{c.label}</Badge></div>
             <div className="mt-3 flex items-center justify-between text-sm"><span className="text-[hsl(var(--text-01))]">{formatCurrency(b.total, b.currency_code)}</span><span className="text-[hsl(var(--text-03))]">v{b.version}</span></div>

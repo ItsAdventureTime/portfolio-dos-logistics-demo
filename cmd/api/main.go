@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/ItsAdventureTime/portfolio-dos-logistics-demo/internal/config"
 	"github.com/ItsAdventureTime/portfolio-dos-logistics-demo/internal/demo"
@@ -48,6 +49,17 @@ func run() error {
 			"username", "admin",
 			"password", "Password123!",
 		)
+
+		// Auto-reset every 30 minutes so each prospect starts fresh.
+		resetInterval := 30 * time.Minute
+		go func() {
+			ticker := time.NewTicker(resetInterval)
+			defer ticker.Stop()
+			for range ticker.C {
+				bootstrapped.ResetFn()
+			}
+		}()
+		log.Info("demo auto-reset scheduled", "interval", resetInterval.String())
 	}
 
 	errCh := make(chan error, 1)

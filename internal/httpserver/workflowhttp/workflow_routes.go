@@ -50,9 +50,13 @@ func Mount(r chi.Router, qSvc *service.QuotationService, wSvc *service.WorkflowS
 		r.Post("/api/disbursements/{id}/transition", h.TransitionDisbursement)
 
 		// Liquidations
+		r.Get("/api/liquidations", h.ListLiquidations)
 		r.Post("/api/liquidations", h.CreateLiquidation)
 		r.Post("/api/liquidations/{id}/reconcile", h.ReconcileLiquidation)
 		r.Post("/api/liquidations/{id}/close", h.CloseLiquidation)
+
+		// Funding sources
+		r.Get("/api/funding-sources", h.ListFundingSources)
 
 		// Billing
 		r.Get("/api/billing", h.ListBilling)
@@ -210,7 +214,13 @@ func (h *handler) TransitionQuotation(w http.ResponseWriter, r *http.Request) {
 // --- Budget Requests ---
 
 func (h *handler) ListBudgetRequests(w http.ResponseWriter, r *http.Request) {
-	writeJSON(w, 200, map[string]any{"budget_requests": []any{}})
+	brs, err := h.workflow.ListBudgetRequests(r.Context())
+	if err != nil {
+		writeErr(w, 500, "internal_error", "An error occurred.")
+		return
+	}
+	if brs == nil { brs = []*domain.BudgetRequest{} }
+	writeJSON(w, 200, map[string]any{"budget_requests": brs})
 }
 
 type createBudgetReq struct {
@@ -259,7 +269,13 @@ func (h *handler) TransitionBudgetRequest(w http.ResponseWriter, r *http.Request
 // --- Disbursements ---
 
 func (h *handler) ListDisbursements(w http.ResponseWriter, r *http.Request) {
-	writeJSON(w, 200, map[string]any{"disbursements": []any{}})
+	ds, err := h.workflow.ListDisbursements(r.Context())
+	if err != nil {
+		writeErr(w, 500, "internal_error", "An error occurred.")
+		return
+	}
+	if ds == nil { ds = []*domain.Disbursement{} }
+	writeJSON(w, 200, map[string]any{"disbursements": ds})
 }
 
 type createDisbursementReq struct {
@@ -303,6 +319,28 @@ func (h *handler) TransitionDisbursement(w http.ResponseWriter, r *http.Request)
 }
 
 // --- Liquidations ---
+
+func (h *handler) ListLiquidations(w http.ResponseWriter, r *http.Request) {
+	ls, err := h.workflow.ListLiquidations(r.Context())
+	if err != nil {
+		writeErr(w, 500, "internal_error", "An error occurred.")
+		return
+	}
+	if ls == nil { ls = []*domain.Liquidation{} }
+	writeJSON(w, 200, map[string]any{"liquidations": ls})
+}
+
+// --- Funding Sources ---
+
+func (h *handler) ListFundingSources(w http.ResponseWriter, r *http.Request) {
+	fss, err := h.workflow.ListFundingSources(r.Context())
+	if err != nil {
+		writeErr(w, 500, "internal_error", "An error occurred.")
+		return
+	}
+	if fss == nil { fss = []*domain.FundingSource{} }
+	writeJSON(w, 200, map[string]any{"funding_sources": fss})
+}
 
 type createLiquidationReq struct {
 	DisbursementID  string `json:"disbursement_id"`
@@ -364,7 +402,13 @@ func (h *handler) CloseLiquidation(w http.ResponseWriter, r *http.Request) {
 // --- Billing ---
 
 func (h *handler) ListBilling(w http.ResponseWriter, r *http.Request) {
-	writeJSON(w, 200, map[string]any{"billing_records": []any{}})
+	bs, err := h.workflow.ListBillingRecords(r.Context())
+	if err != nil {
+		writeErr(w, 500, "internal_error", "An error occurred.")
+		return
+	}
+	if bs == nil { bs = []*domain.BillingRecord{} }
+	writeJSON(w, 200, map[string]any{"billing_records": bs})
 }
 
 type createBillingReq struct {
@@ -406,7 +450,13 @@ func (h *handler) TransitionBilling(w http.ResponseWriter, r *http.Request) {
 // --- Collections ---
 
 func (h *handler) ListPayments(w http.ResponseWriter, r *http.Request) {
-	writeJSON(w, 200, map[string]any{"payments": []any{}})
+	ps, err := h.workflow.ListPayments(r.Context())
+	if err != nil {
+		writeErr(w, 500, "internal_error", "An error occurred.")
+		return
+	}
+	if ps == nil { ps = []*domain.ClientPayment{} }
+	writeJSON(w, 200, map[string]any{"payments": ps})
 }
 
 type recordPaymentReq struct {

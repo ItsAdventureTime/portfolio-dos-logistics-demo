@@ -72,6 +72,62 @@ func NewWorkflowService(
 
 // --- Slice 2: Budget Request ---
 
+// ListBudgetRequests returns all budget requests.
+func (s *WorkflowService) ListBudgetRequests(ctx context.Context) ([]*domain.BudgetRequest, error) {
+	return s.budgetReqs.List(ctx, nil)
+}
+
+// GetBudgetRequest returns a single budget request by ID.
+func (s *WorkflowService) GetBudgetRequest(ctx context.Context, id domain.BudgetRequestID) (*domain.BudgetRequest, error) {
+	return s.budgetReqs.GetByIDWithLines(ctx, id)
+}
+
+// ListFundingSources returns all funding sources.
+func (s *WorkflowService) ListFundingSources(ctx context.Context) ([]*domain.FundingSource, error) {
+	return s.fundingSrc.List(ctx)
+}
+
+// --- Slice 4: Disbursement ---
+
+// ListDisbursements returns all disbursements.
+func (s *WorkflowService) ListDisbursements(ctx context.Context) ([]*domain.Disbursement, error) {
+	return s.disbursements.List(ctx, nil)
+}
+
+// --- Slice 5: Liquidation ---
+
+// ListLiquidations returns all liquidations by iterating over disbursements.
+// Since the in-memory store doesn't have a ListAll, we use GetByDisbursementID
+// for known disbursements. For the demo, this is sufficient.
+func (s *WorkflowService) ListLiquidations(ctx context.Context) ([]*domain.Liquidation, error) {
+	disbs, err := s.disbursements.List(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+	var result []*domain.Liquidation
+	for _, d := range disbs {
+		l, err := s.liquidations.GetByDisbursementID(ctx, d.ID)
+		if err == nil && l != nil {
+			result = append(result, l)
+		}
+	}
+	return result, nil
+}
+
+// --- Slice 6: Billing ---
+
+// ListBillingRecords returns all billing records.
+func (s *WorkflowService) ListBillingRecords(ctx context.Context) ([]*domain.BillingRecord, error) {
+	return s.billing.List(ctx, nil)
+}
+
+// --- Slice 7: Collection ---
+
+// ListPayments returns all client payments.
+func (s *WorkflowService) ListPayments(ctx context.Context) ([]*domain.ClientPayment, error) {
+	return s.payments.List(ctx, nil)
+}
+
 // CreateBudgetRequest creates a funding request linked to an accepted quotation.
 // A budget request must link to an accepted quotation and a client.
 func (s *WorkflowService) CreateBudgetRequest(ctx context.Context, actor domain.UserID, quotationID domain.QuotationID, clientID domain.ClientID, currencyCode, purpose string, amountCents int64) (*domain.BudgetRequest, error) {
